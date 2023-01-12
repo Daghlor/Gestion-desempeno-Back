@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\State;
+use App\Models\StatesObjectives;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,11 +15,22 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('password_resets', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
-        });
+        State::create([
+            'id' => 1,
+            'description' => 'Activo',
+        ]);
+
+        State::create([
+            'id' => 2,
+            'description' => 'Inactivo',
+        ]);
+
+        StatesObjectives::create([
+            'id' => 1,
+            'description' => 'Inactivo',
+        ]);
+
+
     }
 
     /**
@@ -27,6 +40,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('password_resets');
+        //
     }
 };
