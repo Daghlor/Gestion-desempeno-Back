@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('user_historials', function (Blueprint $table) {
             $table->bigIncrements('id')->unsigned();
             $table->string('unique_id', 50)->unique();
-            $table->string('token', 150)->nullable();
+            $table->string('token', 550)->nullable();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();

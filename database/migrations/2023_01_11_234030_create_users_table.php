@@ -25,9 +25,11 @@ return new class extends Migration
             $table->string('password', 150);
             $table->string('address', 40);
             $table->string('city', 50)->nullable();
-            $table->string('dateBirth', 40);
+            $table->integer('verify');
+            $table->string('codeVerify', 120)->nullable();
+            $table->string('dateBirth', 40)->nullable();
             $table->unsignedBigInteger('employment_id');
-            $table->unsignedBigInteger('company_id');
+            $table->unsignedBigInteger('company_id')->nullable();
             $table->unsignedBigInteger('state_id');
             $table->foreign('employment_id')->references('id')->on('employments');
             $table->foreign('company_id')->references('id')->on('companies');
