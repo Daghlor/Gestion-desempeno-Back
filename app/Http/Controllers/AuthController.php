@@ -50,6 +50,7 @@ class AuthController extends Controller
             'token' => $token,
             'user_id' => auth()->user()->id,
         ]);
+        
         return response()->json(array(
             'msg'=> 'Iniciando Sesion',
             'token' => $token,
