@@ -44,6 +44,10 @@ class AuthController extends Controller
         }
 
         auth()->attempt($credentials);
+        $company = [];
+        $roles = [];
+        $permissions = [];
+
 
         UserHistorial::create([
             'unique_id' => Str::uuid()->toString(),
@@ -51,23 +55,34 @@ class AuthController extends Controller
             'user_id' => auth()->user()->id,
         ]);
         
+        if(auth()->user()->company_id){
+            $company = Company::where('id', auth()->user()->company_id)->first();
+        }
+
+        $roles = RolesUsers::where('user_id', auth()->user()->id)
+        ->join('roles', 'roles.id', '=', 'roles_users.user_id')->get(['roles.id', 'unique_id','description']);
+
         return response()->json(array(
             'msg'=> 'Iniciando Sesion',
             'token' => $token,
             'data' => [
-                'unique_id' => auth()->user()->unique_id,
-                'photo' => auth()->user()->photo,
-                'name' => auth()->user()->name,
-                'lastName' => auth()->user()->lastName,
-                'identify' => auth()->user()->identify,
-                'phone' => auth()->user()->phone,
-                'email' => auth()->user()->email,
-                'address' => auth()->user()->address,
-                'dateBirth' => auth()->user()->dateBirth,
-                'employment' => Employment::where('id', auth()->user()->employment_id)->first(['description'])['description'],
-                'state' => State::where('id', auth()->user()->state_id)->first(['description'])['description'],
-                'company' => !auth()->user()->company_id ? '' : Company::where('id', auth()->user()->company)->first(['description'])['description'],
-                'created_at' => auth()->user()->created_at
+                'user' => [
+                    'unique_id' => auth()->user()->unique_id,
+                    'photo' => auth()->user()->photo,
+                    'name' => auth()->user()->name,
+                    'lastName' => auth()->user()->lastName,
+                    'identify' => auth()->user()->identify,
+                    'phone' => auth()->user()->phone,
+                    'email' => auth()->user()->email,
+                    'address' => auth()->user()->address,
+                    'dateBirth' => auth()->user()->dateBirth,
+                    'employment' => Employment::where('id', auth()->user()->employment_id)->first(['description'])['description'],
+                    'state' => State::where('id', auth()->user()->state_id)->first(['description'])['description'],
+                    'created_at' => auth()->user()->created_at
+                ],
+                'company' => $company,
+                'roles' => $roles
+
             ],
             'expired' => env('JWT_TTL'),
             'loged' => true,
