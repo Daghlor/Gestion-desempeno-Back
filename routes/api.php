@@ -27,17 +27,32 @@ Route::group([
 
 Route::group([
     'middleware' => 'api',
-    'prefix' => 'users'
+    'prefix' => 'public'
 ], function ($router) {
-    Route::post('register', [UsersController::class, 'registerAdmin']);
+    Route::post('register', [UsersController::class, 'registerPublic']);
 });
 
-Route::group([
-    'middleware' => 'api',
-    'prefix' => 'roles'
-], function ($router) {
-    Route::post('', [RolesController::class, '']);
+Route::group(['middleware' => ['jwt.verify']], function() {
+    Route::group([
+        'prefix' => 'users'
+    ], function ($router) {
+        Route::post('register', [UsersController::class, 'registerAdmin']);
+        Route::post('getAll', [UsersController::class, 'findAll']);
+        Route::get('getOne/{uuid}', [UsersController::class, 'findOne']);
+        Route::put('update/{uuid}', [UsersController::class, 'update']);
+        Route::delete('delete/{uuid}', [UsersController::class, 'delete']);
+    });
+    
+    
+    Route::group([
+        'prefix' => 'roles'
+    ], function ($router) {
+        Route::post('', [RolesController::class, '']);
+    });
+
 });
+
+
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
