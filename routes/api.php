@@ -29,7 +29,7 @@ Route::group([
     'middleware' => 'api',
     'prefix' => 'users'
 ], function ($router) {
-    Route::post('', [UsersController::class, '']);
+    Route::post('register', [UsersController::class, 'registerAdmin']);
 });
 
 Route::group([
