@@ -214,6 +214,7 @@ return [
         'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class, 
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
         'EmailHelper' => ADP\Helpers\EmailHelper::class,
+        'PhotoHelper' => ADP\Helpers\PhotoHelper::class,
     ])->toArray(),
 
 ];
