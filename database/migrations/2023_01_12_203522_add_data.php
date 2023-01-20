@@ -40,13 +40,26 @@ return new class extends Migration
 
         Employment::create([
             'id' => 1,
+            'unique_id' => Str::uuid()->toString(),
             'description' => 'Administrador',
+        ]);
+
+        Employment::create([
+            'id' => 2,
+            'unique_id' => Str::uuid()->toString(),
+            'description' => 'Empleado',
         ]);
 
         Roles::create([
             'id' => 1,
             'unique_id' => Str::uuid()->toString(),
             'description' => 'Administrador',
+        ]);
+
+        Roles::create([
+            'id' => 2,
+            'unique_id' => Str::uuid()->toString(),
+            'description' => 'Empleado',
         ]);
 
         User::create([

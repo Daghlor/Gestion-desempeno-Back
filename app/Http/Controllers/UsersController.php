@@ -3,13 +3,39 @@
 namespace App\Http\Controllers;
 
 use ADP\Helpers\EmailHelper;
+use ADP\Helpers\PhotoHelper;
 use App\Models\Company;
 use App\Models\RolesUsers;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+
 class UsersController extends Controller
 {
+
+    public function verify (Request $request){
+        $user = auth()->user();
+        $decryp = Hash::check($request->all()['code'], $user->codeVerify);
+
+        if(!$decryp){
+            return response()->json(array(
+                'res'=> false,
+                'data' => 'Codigo Invalido'
+            ), 200);
+        }
+
+        User::where('id', $user->id)->update([
+            'verify' => 1,
+            'codeVerify' => null
+        ]);
+
+        return response()->json(array(
+            'res'=> true,
+            'data' =>  'Usuario Verificado Correctamente'
+        ), 200);
+    }
 
     public function registerPublic (Request $request){
         $validate = User::where('identify', $request->all()['identify'])
@@ -25,10 +51,25 @@ class UsersController extends Controller
         }
 
         $codeVerify = random_int(100000, 999999);
+        $UrlImg = "";
+        if(isset($request->all()['photo'])){
+            $validator = Validator::make($request->all(),[ 
+                'photo'  => 'required|mimes:png,jpg,jpeg|max:2048',
+            ]);
+    
+            if($validator->fails()) {          
+                return response()->json(array(
+                    'data' => 'Formato de la foto es invalido',
+                    'res' => false
+                ), 200);                       
+            }  
+    
+            $UrlImg = PhotoHelper::uploadImg($request->file('photo'), 'user_'.$request->all()['identify'], 'users');
+        }
     
         $user = User::create([
             'unique_id' => Str::uuid()->toString(),
-            //'photo' => $request->all()['nombres'],
+            'photo' => $UrlImg,
             'name' => $request->all()['name'],
             'lastName' => $request->all()['lastName'],
             'identify' => $request->all()['identify'],
@@ -40,13 +81,13 @@ class UsersController extends Controller
             'verify' => 0,
             'codeVerify' => bcrypt($codeVerify),
             'dateBirth' => $request->all()['dateBirth'],
-            'employment_id' => $request->all()['employment_id'],
+            'employment_id' => 2,
             'company_id' => $request->all()['company_id'],
             'state_id' => 1,
         ]);
 
         RolesUsers::create([
-            'rol_id' => 1,
+            'rol_id' => 2,
             'user_id' => $user->id
         ]); 
 
@@ -60,7 +101,8 @@ class UsersController extends Controller
         return response()->json(array(
             'res'=> true,
             'data' => [
-                'id' => $user->id
+                'unique_id' => $user->unique_id,
+                'msg' => 'Usuario Creado Correctamente'
             ]
         ), 200);
     }
@@ -82,10 +124,26 @@ class UsersController extends Controller
         $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-_';
         $codeVerify = random_int(100000, 999999);
         $password = substr(str_shuffle($permitted_chars), 8, 8);
-   
+
+        $UrlImg = "";
+        if(isset($request->all()['photo'])){
+            $validator = Validator::make($request->all(),[ 
+                'photo'  => 'required|mimes:png,jpg,jpeg|max:2048',
+            ]);
+    
+            if($validator->fails()) {          
+                return response()->json(array(
+                    'data' => 'Formato de la foto es invalido',
+                    'res' => false
+                ), 200);                       
+            }  
+    
+            $UrlImg = PhotoHelper::uploadImg($request->file('photo'), 'user_'.$request->all()['identify'], 'users');
+        }
+
         $user = User::create([
             'unique_id' => Str::uuid()->toString(),
-            //'photo' => $request->all()['nombres'],
+            'photo' => $UrlImg,
             'name' => $request->all()['name'],
             'lastName' => $request->all()['lastName'],
             'identify' => $request->all()['identify'],
@@ -107,7 +165,7 @@ class UsersController extends Controller
                 'rol_id' => $request->all()['roles'][$i],
                 'user_id' => $user->id
             ]);
-        }    
+        }
 
         $dataEmail = [
             'name' => $request->all()['name'].' '.$request->all()['lastName'],
@@ -121,7 +179,8 @@ class UsersController extends Controller
         return response()->json(array(
             'res'=> true,
             'data' => [
-                'id' => $user->id
+                'unique_id' => $user->unique_id,
+                'msg' => 'Usuario Creado Correctamente'
             ]
         ), 200);
     }
@@ -274,10 +333,9 @@ class UsersController extends Controller
 
         return response()->json(array(
             'res'=> true,
-            'data' => 'Información Actualizada Correctamente'
+            'data' => 'Usuario Actualizado Correctamente'
         ), 200);
     }
-
 
     //ELIMINAR UN USUARIO
     public function delete (Request $request, $uuid){

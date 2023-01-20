@@ -13,5 +13,4 @@ class RolesPermissions extends Model
         'rol_id',
         'permissions_id',
     ];
-    public $timestamps = false;
 }

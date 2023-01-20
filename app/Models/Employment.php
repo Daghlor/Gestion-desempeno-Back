@@ -10,6 +10,7 @@ class Employment extends Model
     protected $table = "employments";
     protected $fillable = [
         'id',
+        'unique_id',
         'description'
     ];
     public $timestamps = false;
