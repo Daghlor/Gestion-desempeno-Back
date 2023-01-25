@@ -46,6 +46,19 @@ class EmploymentController extends Controller
         ), 200);
     }
 
+    public function FindAllPublic (Request $request){
+        $employment = Employment::orderBy('description', 'asc')
+        ->where('company_id', null) 
+        ->get([
+            'employments.id', 'employments.description'
+        ]);
+
+        return response()->json(array(
+            'res'=> true,
+            'data' => $employment,
+        ), 200);
+    }
+
     public function FindOne (Request $request, $uuid){
         $employment = Employment::where('unique_id', $uuid)->first();
 
