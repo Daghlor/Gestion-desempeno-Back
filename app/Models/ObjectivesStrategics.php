@@ -17,5 +17,6 @@ class ObjectivesStrategics extends Model
         'company_id',
         'user_id',
         'areas_id',
+        'state_id'
     ];
 }

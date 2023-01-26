@@ -1,10 +1,8 @@
 <?php
 
-use App\Models\Employment;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 
 return new class extends Migration
 {
@@ -15,12 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('employments', function (Blueprint $table) {
-            $table->string('unique_id', 50)->unique()->after('id');
-            $table->unsignedBigInteger('company_id')->nullable()->after('description');
-            $table->foreign('company_id')->references('id')->on('companies');
+        Schema::table('objectives_strategics', function (Blueprint $table) {
+            $table->unsignedBigInteger('state_id')->nullable()->after('areas_id');
+            $table->foreign('state_id')->references('id')->on('states');
         });
-
     }
 
     /**

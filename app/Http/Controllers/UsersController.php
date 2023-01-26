@@ -82,7 +82,7 @@ class UsersController extends Controller
             'codeVerify' => bcrypt($codeVerify),
             'dateBirth' => $request->all()['dateBirth'],
             'employment_id' => 2,
-            'company_id' => $request->all()['company_id'],
+            'company_id' => null,
             'state_id' => 1,
         ]);
 
@@ -193,19 +193,24 @@ class UsersController extends Controller
         $direction = $request->all()['direction'];
         $search = $request->all()['search'];
 
+        
+
         $users = User::join('states', 'states.id', '=', 'users.state_id')
         ->join('employments', 'employments.id', '=', 'users.employment_id')
         ->leftjoin('companies', 'companies.id', '=', 'users.company_id');
         if(count($search) > 0){
             if(isset($search['name'])){
-                $users = $users->where('name', 'like', '%'.$search['name'].'%')
-                ->orWhere('lastName', 'like', '%'.$search['lastName'].'%');
+                $users = $users->where('users.name', 'like', '%'.$search['name'].'%')
+                ->orWhere('users.lastName', 'like', '%'.$search['name'].'%');
             }
             if(isset($search['identify'])){
-                $users = $users->where('identify', $search['identify']);
+                $users = $users->where('users.identify', $search['identify']);
             }
             if(isset($search['employment_id'])){
-                $users = $users->where('employment_id',$search['employment_id']);
+                $users = $users->where('users.employment_id',$search['employment_id']);
+            }
+            if(isset($search['state_id'])  && $search['state_id'] != 0){
+                $users = $users->where('users.state_id', $search['state_id']);
             }
         }
         $users = $users->limit($paginate)
@@ -215,7 +220,6 @@ class UsersController extends Controller
             'users.unique_id', 'users.name', 'users.lastName', 'users.identify', 'users.phone', 
             'users.email', 'users.address', 'users.city', 'users.verify', 'users.dateBirth', 
             'users.created_at', 'states.description as state', 'employments.description as employment',
-            'states.description as state', 'employments.description as employment', 
             'companies.businessName as company'
         ]);
 
@@ -223,13 +227,16 @@ class UsersController extends Controller
         if(count($search) > 0){
             if(isset($search['name'])){
                 $count = $count->where('name', 'like', '%'.$search['name'].'%')
-                ->orWhere('lastName', 'like', '%'.$search['lastName'].'%');
+                ->orWhere('lastName', 'like', '%'.$search['name'].'%');
             }
             if(isset($search['identify'])){
                 $count = $count->where('identify', $search['identify']);
             }
             if(isset($search['employment_id'])){
                 $count = $count->where('employment_id',$search['employment_id']);
+            }
+            if(isset($search['state_id']) && $search['state_id'] != 0){
+                $count = $count->where('users.state_id', $search['state_id']);
             }
         }
         $count = $count
@@ -256,10 +263,10 @@ class UsersController extends Controller
             'users.id', 'users.unique_id', 'users.name', 'users.lastName', 'users.identify', 'users.phone', 
             'users.email', 'users.address', 'users.city', 'users.verify', 'users.dateBirth', 
             'users.created_at', 'states.description as state', 'employments.description as employment',
-            'states.description as state', 'employments.description as employment', 
+            'users.company_id'
         ]);
 
-        $user->company = Company::where('id', $user->company_id)->get();
+        $user->company = Company::where('id', $user->company_id)->first();
         $user->roles = RolesUsers::where('user_id', $user->id)->join('roles', 'roles.id', '=', 'roles_users.rol_id')->get(['roles.id', 'unique_id', 'description']);
 
         return response()->json(array(
@@ -286,8 +293,24 @@ class UsersController extends Controller
         $user = User::where('unique_id', $uuid)->first(['id', 'unique_id','email']);
         $codeVerify = random_int(100000, 999999);
 
+        $UrlImg = "";
+        if(isset($request->all()['photo'])){
+            $validator = Validator::make($request->all(),[ 
+                'photo'  => 'required|mimes:png,jpg,jpeg|max:2048',
+            ]);
+    
+            if($validator->fails()) {          
+                return response()->json(array(
+                    'data' => 'Formato de la foto es invalido',
+                    'res' => false
+                ), 200);                       
+            }  
+    
+            $UrlImg = PhotoHelper::uploadImg($request->file('photo'), 'user_'.$request->all()['identify'], 'users');
+        }
+
         User::where('unique_id', $uuid)->update([
-            //'photo' => $request->all()['nombres'],
+            'photo' => $UrlImg,
             'name' => $request->all()['name'],
             'lastName' => $request->all()['lastName'],
             'identify' => $request->all()['identify'],
