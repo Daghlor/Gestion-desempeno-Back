@@ -71,7 +71,7 @@ class CompanyController extends Controller
         return response()->json(array(
             'res'=> true,
             'data' => [
-                'roles' => $company->unique_id,
+                'company' => $company->unique_id,
                 'msg' => 'Empresa Creada Correctamente'
             ]
         ), 200);
