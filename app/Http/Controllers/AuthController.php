@@ -76,6 +76,7 @@ class AuthController extends Controller
                     'email' => auth()->user()->email,
                     'address' => auth()->user()->address,
                     'dateBirth' => auth()->user()->dateBirth,
+                    'verify' => auth()->user()->verify,
                     'employment' => Employment::where('id', auth()->user()->employment_id)->first(['description'])['description'],
                     'state' => State::where('id', auth()->user()->state_id)->first(['description'])['description'],
                     'created_at' => auth()->user()->created_at
