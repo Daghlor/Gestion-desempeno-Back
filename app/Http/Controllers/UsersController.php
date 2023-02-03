@@ -81,7 +81,7 @@ class UsersController extends Controller
             'verify' => 0,
             'codeVerify' => bcrypt($codeVerify),
             'dateBirth' => $request->all()['dateBirth'],
-            'employment_id' => 2,
+            'employment_id' => 2, 
             'company_id' => null,
             'state_id' => 1,
         ]);
