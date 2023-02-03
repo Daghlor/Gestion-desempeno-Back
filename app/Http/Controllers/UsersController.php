@@ -98,6 +98,8 @@ class UsersController extends Controller
 
         EmailHelper::sendMail('mails.users.Verify', $dataEmail, $request->all()['email'], "Codigo de verificación - Gestion Desempeño");
 
+        //EmailHelper::sendMail('mails.users.Verify', $dataEmail, $request->all()['email'], "Codigo de verificación - Gestion Desempeño");
+
         return response()->json(array(
             'res'=> true,
             'data' => [
@@ -160,12 +162,12 @@ class UsersController extends Controller
             'state_id' => 1,
         ]);
 
-        for ($i=0; $i < count($request->all()['roles']); $i++) {
+        /*for ($i=0; $i < count($request->all()['roles']); $i++) {
             RolesUsers::create([
                 'rol_id' => $request->all()['roles'][$i],
                 'user_id' => $user->id
             ]);
-        }
+        }*/
 
         $dataEmail = [
             'name' => $request->all()['name'].' '.$request->all()['lastName'],
