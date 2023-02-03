@@ -53,20 +53,20 @@ class UsersController extends Controller
         $codeVerify = random_int(100000, 999999);
         $UrlImg = "";
         if(isset($request->all()['photo'])){
-            $validator = Validator::make($request->all(),[ 
+            $validator = Validator::make($request->all(),[
                 'photo'  => 'required|mimes:png,jpg,jpeg|max:2048',
             ]);
-    
-            if($validator->fails()) {          
+
+            if($validator->fails()) {
                 return response()->json(array(
                     'data' => 'Formato de la foto es invalido',
                     'res' => false
-                ), 200);                       
-            }  
-    
+                ), 200);
+            }
+
             $UrlImg = PhotoHelper::uploadImg($request->file('photo'), 'user_'.$request->all()['identify'], 'users');
         }
-    
+
         $user = User::create([
             'unique_id' => Str::uuid()->toString(),
             'photo' => $UrlImg,
@@ -89,7 +89,7 @@ class UsersController extends Controller
         RolesUsers::create([
             'rol_id' => 2,
             'user_id' => $user->id
-        ]); 
+        ]);
 
         $dataEmail = [
             'name' => $request->all()['name'].' '.$request->all()['lastName'],
@@ -127,17 +127,17 @@ class UsersController extends Controller
 
         $UrlImg = "";
         if(isset($request->all()['photo'])){
-            $validator = Validator::make($request->all(),[ 
+            $validator = Validator::make($request->all(),[
                 'photo'  => 'required|mimes:png,jpg,jpeg|max:2048',
             ]);
-    
-            if($validator->fails()) {          
+
+            if($validator->fails()) {
                 return response()->json(array(
                     'data' => 'Formato de la foto es invalido',
                     'res' => false
-                ), 200);                       
-            }  
-    
+                ), 200);
+            }
+
             $UrlImg = PhotoHelper::uploadImg($request->file('photo'), 'user_'.$request->all()['identify'], 'users');
         }
 
@@ -160,7 +160,7 @@ class UsersController extends Controller
             'state_id' => 1,
         ]);
 
-        for ($i=0; $i < count($request->all()['roles']); $i++) { 
+        for ($i=0; $i < count($request->all()['roles']); $i++) {
             RolesUsers::create([
                 'rol_id' => $request->all()['roles'][$i],
                 'user_id' => $user->id
@@ -193,7 +193,7 @@ class UsersController extends Controller
         $direction = $request->all()['direction'];
         $search = $request->all()['search'];
 
-        
+
 
         $users = User::join('states', 'states.id', '=', 'users.state_id')
         ->join('employments', 'employments.id', '=', 'users.employment_id')
@@ -217,8 +217,8 @@ class UsersController extends Controller
         ->offset(($page-1)*$paginate)
         ->orderBy($column, $direction)
         ->get([
-            'users.unique_id', 'users.name', 'users.lastName', 'users.identify', 'users.phone', 
-            'users.email', 'users.address', 'users.city', 'users.verify', 'users.dateBirth', 
+            'users.unique_id', 'users.name', 'users.lastName', 'users.identify', 'users.phone',
+            'users.email', 'users.address', 'users.city', 'users.verify', 'users.dateBirth',
             'users.created_at', 'states.description as state', 'employments.description as employment',
             'companies.businessName as company'
         ]);
@@ -260,8 +260,8 @@ class UsersController extends Controller
         ->join('employments', 'employments.id', '=', 'users.employment_id')
         ->leftjoin('companies', 'companies.id', '=', 'users.company_id')
         ->first([
-            'users.id', 'users.unique_id', 'users.name', 'users.lastName', 'users.identify', 'users.phone', 
-            'users.email', 'users.address', 'users.city', 'users.verify', 'users.dateBirth', 
+            'users.id', 'users.unique_id', 'users.name', 'users.lastName', 'users.identify', 'users.phone',
+            'users.email', 'users.address', 'users.city', 'users.verify', 'users.dateBirth',
             'users.created_at', 'states.description as state', 'employments.description as employment',
             'users.company_id'
         ]);
@@ -295,17 +295,17 @@ class UsersController extends Controller
 
         $UrlImg = "";
         if(isset($request->all()['photo'])){
-            $validator = Validator::make($request->all(),[ 
+            $validator = Validator::make($request->all(),[
                 'photo'  => 'required|mimes:png,jpg,jpeg|max:2048',
             ]);
-    
-            if($validator->fails()) {          
+
+            if($validator->fails()) {
                 return response()->json(array(
                     'data' => 'Formato de la foto es invalido',
                     'res' => false
-                ), 200);                       
-            }  
-    
+                ), 200);
+            }
+
             $UrlImg = PhotoHelper::uploadImg($request->file('photo'), 'user_'.$request->all()['identify'], 'users');
         }
 
@@ -333,14 +333,14 @@ class UsersController extends Controller
                 'name' => $request->all()['name'].' '.$request->all()['lastName'],
                 'code' => $codeVerify,
             ];
-    
+
             EmailHelper::sendMail('mails.users.Verify', $dataEmail, $request->all()['email'], "Codigo de verificación - Gestion Desempeño");
         }
 
         if(count($request->all()['roles']) > 0){
             RolesUsers::where('user_id', $user->id)->delete();
 
-            for ($i=0; $i < count($request->all()['roles']); $i++) { 
+            for ($i=0; $i < count($request->all()['roles']); $i++) {
                 RolesUsers::create([
                     'rol_id' => $request->all()['roles'][$i],
                     'user_id' => $user->id
