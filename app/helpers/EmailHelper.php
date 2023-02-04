@@ -11,7 +11,7 @@ class EmailHelper
         $subject = $razon;
         $for = $email;
         Mail::send($view, $params, function($msj) use($subject,$for){
-            $msj->from("dtuta@engagement.com.co", "Engagement");
+            $msj->from("santiagodiaztuta@gmail.com", "Engagement");
             $msj->subject($subject);
             $msj->to($for);
         });
