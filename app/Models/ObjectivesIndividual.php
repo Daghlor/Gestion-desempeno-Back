@@ -11,6 +11,7 @@ class ObjectivesIndividual extends Model
     protected $fillable = [
         'id',
         'unique_id',
+        'title',
         'objetive',
         'weight',
         'user_id',

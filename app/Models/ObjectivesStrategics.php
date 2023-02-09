@@ -11,6 +11,7 @@ class ObjectivesStrategics extends Model
     protected $fillable = [
         'id',
         'unique_id',
+        'title',
         'mission',
         'vision',
         'totalWeight',

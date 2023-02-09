@@ -67,6 +67,7 @@ class AuthController extends Controller
             'token' => $token,
             'data' => [
                 'user' => [
+                    'id' =>  auth()->user()->id,
                     'unique_id' => auth()->user()->unique_id,
                     'photo' => auth()->user()->photo,
                     'name' => auth()->user()->name,

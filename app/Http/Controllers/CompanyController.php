@@ -12,6 +12,7 @@ use App\Models\ColorsCompany;
 use App\Models\Employment;
 use App\Models\ObjectivesStrategics;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class CompanyController extends Controller
 {
@@ -165,7 +166,12 @@ class CompanyController extends Controller
 
     public function FindOne (Request $request, $uuid){
         $companies = Company::join('states', 'states.id', '=', 'companies.state_id')
-        ->where('unique_id', $uuid)->first();
+        ->where('unique_id', $uuid)->first([
+            'companies.id', 'companies.unique_id', 'companies.logo', 'companies.nit',
+            'companies.businessName', 'companies.description', 'companies.mission',
+            'companies.vision', 'companies.phone', 'companies.email', 'companies.address',
+            'companies.city', 'states.description as state',
+        ]);
 
         $companies->colors = ColorsCompany::where('company_id', $companies->id)->get();
         $companies->users = User::where('users.company_id', $companies->id)
@@ -177,7 +183,16 @@ class CompanyController extends Controller
             'users.created_at', 'states.description as state', 'employments.description as employment', 
         ]);
         $companies->employments = Employment::where('company_id', $companies->id)->get();
-        $companies->strategics = ObjectivesStrategics::where('company_id', $companies->id)->get();
+        $companies->strategics = ObjectivesStrategics::where('objectives_strategics.company_id', $companies->id)
+        ->where('objectives_strategics.state_id', 1)
+        ->join('users', 'users.id', '=', 'objectives_strategics.user_id')
+        ->join('states', 'states.id', '=', 'objectives_strategics.state_id')
+        ->get([
+            'objectives_strategics.id', 'objectives_strategics.unique_id', 'objectives_strategics.title', 
+            'objectives_strategics.mission', 'objectives_strategics.vision', 'objectives_strategics.totalWeight',
+            'objectives_strategics.company_id', 'objectives_strategics.user_id', 'objectives_strategics.areas_id',
+            'objectives_strategics.state_id', 'states.description as state', DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"),
+        ]);
         $companies->areas = Area::where('company_id', $companies->id)->get();
 
 
@@ -228,9 +243,9 @@ class CompanyController extends Controller
             'city' => $request->all()['city'],
         ]);
 
-        ColorsCompany::where('company_id', $companies->id)->delete();
+       
         for ($i=0; $i < count($request->all()['colors']); $i++) {
-            ColorsCompany::create([
+           /* ColorsCompany::create([
                 'unique_id' => Str::uuid()->toString().'-'.$request->all()['nit'].'-'.$i,
                 'label' => $request->all()['colors'][$i]['label'],
                 'rgb' => $request->all()['colors'][$i]['rgb'],
@@ -238,7 +253,72 @@ class CompanyController extends Controller
                 'principal' => $request->all()['colors'][$i]['principal'],
                 'location' => $request->all()['colors'][$i]['location'],
                 'company_id' => $companies->id
-            ]);
+            ]);*/
+        }
+
+        for ($i=0; $i < count($request->all()['strategics']); $i++) {
+            $strategics = $request->all()['strategics'][$i];
+
+            if($strategics['create']){
+                ObjectivesStrategics::create([
+                    'unique_id' => Str::uuid()->toString(),
+                    'title' => $strategics['title'],
+                    'mission' => $strategics['mission'],
+                    'vision' => $strategics['vision'],
+                    'totalWeight' => $strategics['totalWeight'],
+                    'company_id' => $strategics['company_id'],
+                    'user_id' => auth()->user()->id,
+                    'areas_id' => $strategics['areas_id'],
+                    'state_id' => 1
+                ]);
+            }
+
+            if($strategics['delete']){
+                ObjectivesStrategics::where('unique_id', $strategics['unique_id'])->update([
+                    'state_id' => 2
+                ]);
+            }
+            
+        }
+
+        for ($i=0; $i < count($request->all()['employments']); $i++) {
+            $employment = $request->all()['employments'][$i];
+
+            if($employment['create']){
+                Employment::create([
+                    'unique_id' => Str::uuid()->toString(),
+                    'description' => $employment['description'],
+                    'company_id' => $employment['company_id'],
+                ]);
+            }
+
+            if($employment['update']){
+                Employment::where('unique_id', $employment['unique_id'])->update([
+                    'description' => $employment['description'],
+                    'company_id' => $employment['company_id'],
+                ]);
+            }
+            
+        }
+
+        for ($i=0; $i < count($request->all()['areas']); $i++) {
+            $area = $request->all()['areas'][$i];
+
+            if($area['create']){
+                Area::create([
+                    'unique_id' => Str::uuid()->toString(),
+                    'description' => $area['description'],
+                    'company_id' => $area['company_id'],
+                ]);
+            }
+
+            if($area['update']){
+                Area::where('unique_id', $area->unique_id)->update([
+                    'description' => $area['description'],
+                    'company_id' => $area['company_id'],
+                ]);
+            }
+            
         }
        
         return response()->json(array(

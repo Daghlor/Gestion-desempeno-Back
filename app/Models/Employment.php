@@ -11,7 +11,8 @@ class Employment extends Model
     protected $fillable = [
         'id',
         'unique_id',
-        'description'
+        'description',
+        'company_id'
     ];
     public $timestamps = false;
 }
