@@ -47,7 +47,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
         Route::delete('delete/{uuid}', [UsersController::class, 'delete']);
         Route::post('verify', [UsersController::class, 'verify']);
     });
-    
+
     Route::group([
         'prefix' => 'roles'
     ], function ($router) {
@@ -61,7 +61,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
         'prefix' => 'employment'
     ], function ($router) {
         Route::post('create', [EmploymentController::class, 'Create']);
-        Route::get('getAll', [EmploymentController::class, 'FindAll']);
+        Route::post('getAll', [EmploymentController::class, 'FindAll']);
         Route::get('getOne/{uuid}', [EmploymentController::class, 'FindOne']);
         Route::put('update/{uuid}', [EmploymentController::class, 'Update']);
     });
