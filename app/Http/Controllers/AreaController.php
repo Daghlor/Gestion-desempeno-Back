@@ -8,6 +8,15 @@ use Illuminate\Support\Str;
 class AreaController extends Controller
 {
     public function Create (Request $request){
+        $validate = Area::where('description', $request->all()['description'])->first();
+
+        if(isset($validate) == true){
+            return response()->json(array(
+                'data' => 'Ya existe un area con la misma descripción',
+                'res' => false
+            ), 200);
+        }
+
         $area = Area::create([
             'unique_id' => Str::uuid()->toString(),
             'description' => $request->all()['description'],

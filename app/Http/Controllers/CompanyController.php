@@ -6,13 +6,14 @@ use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
-use ADP\Helpers\PhotoHelper;
 use App\Models\Area;
 use App\Models\ColorsCompany;
 use App\Models\Employment;
 use App\Models\ObjectivesStrategics;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use ADP\Helpers\EmailHelper;
+use ADP\Helpers\PhotoHelper;
 
 class CompanyController extends Controller
 {
@@ -28,18 +29,7 @@ class CompanyController extends Controller
 
         $UrlImg = "";
         if(isset($request->all()['logo'])){
-            $validator = Validator::make($request->all(),[ 
-                'logo'  => 'required|mimes:png,jpg,jpeg|max:2048',
-            ]);
-    
-            if($validator->fails()) {          
-                return response()->json(array(
-                    'data' => 'Formato de la foto es invalido',
-                    'res' => false
-                ), 200);                       
-            }  
-    
-            $UrlImg = PhotoHelper::uploadImg($request->file('logo'), 'company_'.$request->all()['nit'].'_'.$request->all()['businessName'], 'companies');
+            $UrlImg = PhotoHelper::uploadBase64($request->all()['logo'], 'company_'.$request->all()['nit'].'_'.$request->all()['businessName'], 'companies');
         }
 
         $company = Company::create([
@@ -175,11 +165,12 @@ class CompanyController extends Controller
 
         $companies->colors = ColorsCompany::where('company_id', $companies->id)->get();
         $companies->users = User::where('users.company_id', $companies->id)
+        ->where('users.state_id', 1)
         ->join('states', 'states.id', '=', 'users.state_id')
         ->join('employments', 'employments.id', '=', 'users.employment_id')
         ->get([
-            'users.id', 'users.unique_id', 'users.name', 'users.lastName', 'users.identify', 'users.phone', 
-            'users.email', 'users.address', 'users.city', 'users.verify', 'users.dateBirth', 
+            'users.id', 'users.unique_id', 'users.photo', 'users.name', 'users.lastName', 'users.identify', 'users.phone', 
+            'users.email', 'users.address', 'users.city', 'users.verify', 'users.dateBirth', 'users.employment_id',
             'users.created_at', 'states.description as state', 'employments.description as employment', 
         ]);
         $companies->employments = Employment::where('company_id', $companies->id)->get();
@@ -212,24 +203,14 @@ class CompanyController extends Controller
             ), 200);
         }
 
-        $UrlImg = "";
+        $companies = Company::where('unique_id', $uuid)->first(['id', 'unique_id','businessName', 'logo']);
+        $UrlImg = $companies->logo;
+
         if(isset($request->all()['logo'])){
-            $validator = Validator::make($request->all(),[ 
-                'logo'  => 'required|mimes:png,jpg,jpeg|max:2048',
-            ]);
-    
-            if($validator->fails()) {          
-                return response()->json(array(
-                    'data' => 'Formato de la foto es invalido',
-                    'res' => false
-                ), 200);                       
-            }  
-    
-            $UrlImg = PhotoHelper::uploadImg($request->file('logo'), 'company_'.$request->all()['nit'].'_'.$request->all()['businessName'], 'companies');
+            $UrlImg = PhotoHelper::uploadBase64($request->all()['logo'], 'company_'.$request->all()['nit'].'_'.$request->all()['businessName'], 'companies');
         }
 
-        $companies = Company::where('unique_id', $uuid)->first(['id', 'unique_id','businessName']);
-        $company = Company::where('unique_id', $uuid)
+        Company::where('unique_id', $uuid)
         ->update([
             'logo' => $UrlImg,
             'nit' => $request->all()['nit'],
@@ -243,7 +224,10 @@ class CompanyController extends Controller
             'city' => $request->all()['city'],
         ]);
 
-       
+        $notSaveUsers = 0;
+        $notSaveEmployments = 0;
+        $notSaveAreas = 0;
+
         for ($i=0; $i < count($request->all()['colors']); $i++) {
            /* ColorsCompany::create([
                 'unique_id' => Str::uuid()->toString().'-'.$request->all()['nit'].'-'.$i,
@@ -255,6 +239,76 @@ class CompanyController extends Controller
                 'company_id' => $companies->id
             ]);*/
         }
+
+
+        for ($i=0; $i < count($request->all()['users']); $i++) {
+            $users = $request->all()['users'][$i];
+
+            if($users['create']){
+                $validate = User::where('identify', $users['identify'])
+                ->orWhere('email', $users['email'])
+                ->orWhere('phone', $users['phone'])
+                ->first();
+
+                if(isset($validate) == false){
+                    $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-_';
+                    $codeVerify = random_int(100000, 999999);
+                    $password = substr(str_shuffle($permitted_chars), 8, 8);
+
+                    User::create([
+                        'unique_id' => Str::uuid()->toString(),
+                        'name' => $users['name'],
+                        'lastName' => $users['lastName'],
+                        'identify' => $users['identify'],
+                        'phone' => $users['phone'],
+                        'email' => $users['email'],
+                        'password' => bcrypt($password),
+                        'address' => $users['address'],
+                        'city' => $users['city'],
+                        'verify' => 0,
+                        'codeVerify' => bcrypt($codeVerify),
+                        'dateBirth' => $users['dateBirth'],
+                        'employment_id' => $users['employment_id'],
+                        'company_id' => $users['company_id'],
+                        'state_id' => 1,
+                    ]);
+    
+                    $dataEmail = [
+                        'name' => $users['name'].' '.$users['lastName'],
+                        'code' => $codeVerify,
+                        'pass' => $password
+                    ];
+            
+                   // EmailHelper::sendMail('mails.users.Register', $dataEmail, $users['email'], "Contraseña - Gestion Desempeño");
+                   // EmailHelper::sendMail('mails.users.Verify', $dataEmail, $users['email'], "Codigo de verificación - Gestion Desempeño");
+                }else{
+                    $notSaveUsers = $notSaveUsers + 1;
+                }
+        
+            }
+
+            if($users['update']){
+                User::where('unique_id', $users['unique_id'])->update([
+                    'name' => $users['name'],
+                    'lastName' => $users['lastName'],
+                    'identify' => $users['identify'],
+                    'phone' => $users['phone'],
+                    'address' => $users['address'],
+                    'city' => $users['city'],
+                    'dateBirth' => $users['dateBirth'],
+                    'employment_id' => $users['employment_id'],
+                    'company_id' => $users['company_id'],
+                ]);
+            }
+
+            if($users['delete']){
+                User::where('unique_id', $users['unique_id'])->update([
+                    'state_id' => 2,
+                ]);
+            }
+            
+        }
+
 
         for ($i=0; $i < count($request->all()['strategics']); $i++) {
             $strategics = $request->all()['strategics'][$i];
@@ -285,11 +339,18 @@ class CompanyController extends Controller
             $employment = $request->all()['employments'][$i];
 
             if($employment['create']){
-                Employment::create([
-                    'unique_id' => Str::uuid()->toString(),
-                    'description' => $employment['description'],
-                    'company_id' => $employment['company_id'],
-                ]);
+                $validate = Employment::where('description', $employment['description'])->first();
+
+                if(isset($validate) == false){
+                    Employment::create([
+                        'unique_id' => Str::uuid()->toString(),
+                        'description' => $employment['description'],
+                        'company_id' => $employment['company_id'],
+                    ]);
+                }else{
+                    $notSaveEmployments = $notSaveEmployments + 1;
+                }
+               
             }
 
             if($employment['update']){
@@ -298,22 +359,27 @@ class CompanyController extends Controller
                     'company_id' => $employment['company_id'],
                 ]);
             }
-            
         }
 
         for ($i=0; $i < count($request->all()['areas']); $i++) {
             $area = $request->all()['areas'][$i];
 
             if($area['create']){
-                Area::create([
-                    'unique_id' => Str::uuid()->toString(),
-                    'description' => $area['description'],
-                    'company_id' => $area['company_id'],
-                ]);
+                $validate = Area::where('description', $area['description'])->first();
+
+                if(isset($validate) == false){
+                    Area::create([
+                        'unique_id' => Str::uuid()->toString(),
+                        'description' => $area['description'],
+                        'company_id' => $area['company_id'],
+                    ]);
+                }else{
+                    $notSaveAreas = $notSaveAreas + 1;
+                }
             }
 
             if($area['update']){
-                Area::where('unique_id', $area->unique_id)->update([
+                Area::where('unique_id', $area['unique_id'])->update([
                     'description' => $area['description'],
                     'company_id' => $area['company_id'],
                 ]);
