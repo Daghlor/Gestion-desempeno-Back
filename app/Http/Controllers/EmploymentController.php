@@ -13,7 +13,7 @@ class EmploymentController extends Controller
 
         if(isset($validate) == true){
             return response()->json(array(
-                'data' => 'Ya existe un rol con la misma descripción',
+                'data' => 'Ya existe un cargo con la misma descripción',
                 'res' => false
             ), 200);
         }
