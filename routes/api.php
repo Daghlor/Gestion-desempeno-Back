@@ -24,6 +24,7 @@ Route::group([
 ], function ($router) {
     Route::post('login', [AuthController::class, 'login']);
     Route::post('logout', [AuthController::class, 'logout']);
+    Route::get('findData', [AuthController::class, 'findData']);
 });
 
 Route::group([
@@ -36,6 +37,13 @@ Route::group([
 });
 
 Route::group(['middleware' => ['jwt.verify']], function() {
+
+    Route::group([
+        'middleware' => 'api',
+        'prefix' => 'auth'
+    ], function ($router) {
+        Route::get('findData', [AuthController::class, 'findData']);
+    });
 
     Route::group([
         'prefix' => 'users'

@@ -279,8 +279,8 @@ class CompanyController extends Controller
                         'pass' => $password
                     ];
             
-                   // EmailHelper::sendMail('mails.users.Register', $dataEmail, $users['email'], "Contraseña - Gestion Desempeño");
-                   // EmailHelper::sendMail('mails.users.Verify', $dataEmail, $users['email'], "Codigo de verificación - Gestion Desempeño");
+                    EmailHelper::sendMail('mails.users.Register', $dataEmail, $users['email'], "Contraseña - Gestion Desempeño");
+                    EmailHelper::sendMail('mails.users.Verify', $dataEmail, $users['email'], "Codigo de verificación - Gestion Desempeño");
                 }else{
                     $notSaveUsers = $notSaveUsers + 1;
                 }

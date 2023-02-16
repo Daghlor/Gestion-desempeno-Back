@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Models\Employment;
+use App\Models\Roles;
 use App\Models\RolesUsers;
 use App\Models\State;
 use App\Models\UserHistorial;
@@ -92,6 +93,18 @@ class AuthController extends Controller
 
     }
 
+    public function findData(Request $request){
+        $companies = Company::where('state_id', 1)->get(['id', 'businessName']);
+        $roles = Roles::get(['id', 'description']);
+        $employments = Employment::get(['id', 'description', 'company_id']);
+
+        return response()->json(array(
+            'companies' => $companies,
+            'employments' => $employments,
+            'roles' => $roles,
+        ), 200);
+    }
+
     public function logout(Request $request)
     {
         auth()->logout();
@@ -99,6 +112,6 @@ class AuthController extends Controller
         return response()->json(array(
             'msg'=> 'Se Cerró la Sesión Correctamente',
             'loged' => true,
-        ), 400);
+        ), 200);
     }
 }
