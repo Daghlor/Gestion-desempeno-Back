@@ -34,7 +34,6 @@ class CompanyController extends Controller
 
         $company = Company::create([
             'unique_id' => Str::uuid()->toString(),
-            'logo' => $UrlImg,
             'nit' => $request->all()['nit'],
             'businessName' => $request->all()['businessName'],
             'description' => $request->all()['description'],
@@ -46,6 +45,12 @@ class CompanyController extends Controller
             'city' => $request->all()['city'],
             'state_id' => 1
         ]);
+
+        if($UrlImg != ""){
+            Company::where('unique_id', $company->unique_id)->update([
+                'logo' => $UrlImg,
+            ]);
+        }
 
         for ($i=0; $i < count($request->all()['colors']); $i++) { 
             ColorsCompany::create([
@@ -209,10 +214,9 @@ class CompanyController extends Controller
         if(isset($request->all()['logo'])){
             $UrlImg = PhotoHelper::uploadBase64($request->all()['logo'], 'company_'.$request->all()['nit'].'_'.$request->all()['businessName'], 'companies');
         }
-
+        
         Company::where('unique_id', $uuid)
         ->update([
-            'logo' => $UrlImg,
             'nit' => $request->all()['nit'],
             'businessName' => $request->all()['businessName'],
             'description' => $request->all()['description'],
@@ -223,6 +227,12 @@ class CompanyController extends Controller
             'address' => $request->all()['address'],
             'city' => $request->all()['city'],
         ]);
+
+        if($UrlImg != ""){
+            Company::where('unique_id', $uuid)->update([
+                'logo' => $UrlImg,
+            ]);
+        }
 
         $notSaveUsers = 0;
         $notSaveEmployments = 0;

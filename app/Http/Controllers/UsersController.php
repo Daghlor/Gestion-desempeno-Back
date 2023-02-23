@@ -53,23 +53,11 @@ class UsersController extends Controller
         $codeVerify = random_int(100000, 999999);
         $UrlImg = "";
         if(isset($request->all()['photo'])){
-            $validator = Validator::make($request->all(),[
-                'photo'  => 'required|mimes:png,jpg,jpeg|max:2048',
-            ]);
-
-            if($validator->fails()) {
-                return response()->json(array(
-                    'data' => 'Formato de la foto es invalido',
-                    'res' => false
-                ), 200);
-            }
-
-            $UrlImg = PhotoHelper::uploadImg($request->file('photo'), 'user_'.$request->all()['identify'], 'users');
+            $UrlImg = PhotoHelper::uploadBase64($request->all()['photo'], 'user_'.$request->all()['identify'], 'users');
         }
 
         $user = User::create([
             'unique_id' => Str::uuid()->toString(),
-            'photo' => $UrlImg,
             'name' => $request->all()['name'],
             'lastName' => $request->all()['lastName'],
             'identify' => $request->all()['identify'],
@@ -85,6 +73,12 @@ class UsersController extends Controller
             'company_id' => null,
             'state_id' => 1,
         ]);
+
+        if($UrlImg != ""){
+            User::where('unique_id', $user->unique_id)->update([
+                'photo' => $UrlImg,
+            ]);
+        }
 
         RolesUsers::create([
             'rol_id' => 2,
@@ -129,23 +123,11 @@ class UsersController extends Controller
 
         $UrlImg = "";
         if(isset($request->all()['photo'])){
-            $validator = Validator::make($request->all(),[
-                'photo'  => 'required|mimes:png,jpg,jpeg|max:2048',
-            ]);
-
-            if($validator->fails()) {
-                return response()->json(array(
-                    'data' => 'Formato de la foto es invalido',
-                    'res' => false
-                ), 200);
-            }
-
-            $UrlImg = PhotoHelper::uploadImg($request->file('photo'), 'user_'.$request->all()['identify'], 'users');
+            $UrlImg = PhotoHelper::uploadBase64($request->all()['photo'], 'user_'.$request->all()['identify'], 'users');
         }
 
         $user = User::create([
             'unique_id' => Str::uuid()->toString(),
-            'photo' => $UrlImg,
             'name' => $request->all()['name'],
             'lastName' => $request->all()['lastName'],
             'identify' => $request->all()['identify'],
@@ -162,12 +144,18 @@ class UsersController extends Controller
             'state_id' => 1,
         ]);
 
-        /*for ($i=0; $i < count($request->all()['roles']); $i++) {
+        if($UrlImg != ""){
+            User::where('unique_id', $user->unique_id)->update([
+                'photo' => $UrlImg,
+            ]);
+        }
+
+        for ($i=0; $i < count($request->all()['roles']); $i++) {
             RolesUsers::create([
-                'rol_id' => $request->all()['roles'][$i],
+                'rol_id' => $request->all()['roles'][$i]['id'],
                 'user_id' => $user->id
             ]);
-        }*/
+        }
 
         $dataEmail = [
             'name' => $request->all()['name'].' '.$request->all()['lastName'],
@@ -265,11 +253,11 @@ class UsersController extends Controller
             'users.id', 'users.unique_id', 'users.name', 'users.lastName', 'users.identify', 'users.phone',
             'users.email', 'users.address', 'users.city', 'users.verify', 'users.dateBirth',
             'users.created_at', 'states.description as state', 'employments.description as employment',
-            'users.company_id'
+            'users.company_id', 'users.employment_id', 'users.photo'
         ]);
 
         $user->company = Company::where('id', $user->company_id)->first();
-        $user->roles = RolesUsers::where('user_id', $user->id)->join('roles', 'roles.id', '=', 'roles_users.rol_id')->get(['roles.id', 'unique_id', 'description']);
+        $user->roles = RolesUsers::where('user_id', $user->id)->join('roles', 'roles.id', '=', 'roles_users.rol_id')->get(['roles.id', 'description']);
 
         return response()->json(array(
             'res'=> true,
@@ -297,22 +285,10 @@ class UsersController extends Controller
 
         $UrlImg = "";
         if(isset($request->all()['photo'])){
-            $validator = Validator::make($request->all(),[
-                'photo'  => 'required|mimes:png,jpg,jpeg|max:2048',
-            ]);
-
-            if($validator->fails()) {
-                return response()->json(array(
-                    'data' => 'Formato de la foto es invalido',
-                    'res' => false
-                ), 200);
-            }
-
-            $UrlImg = PhotoHelper::uploadImg($request->file('photo'), 'user_'.$request->all()['identify'], 'users');
+            $UrlImg = PhotoHelper::uploadBase64($request->all()['photo'], 'user_'.$request->all()['identify'], 'users');
         }
 
         User::where('unique_id', $uuid)->update([
-            'photo' => $UrlImg,
             'name' => $request->all()['name'],
             'lastName' => $request->all()['lastName'],
             'identify' => $request->all()['identify'],
@@ -323,6 +299,12 @@ class UsersController extends Controller
             'employment_id' => $request->all()['employment_id'],
             'company_id' => $request->all()['company_id'],
         ]);
+
+        if($UrlImg != ""){
+            User::where('unique_id', $user->unique_id)->update([
+                'photo' => $UrlImg,
+            ]);
+        }
 
         if($request->all()['email'] != $user->email){
             User::where('unique_id', $uuid)->update([
@@ -340,13 +322,19 @@ class UsersController extends Controller
         }
 
         if(count($request->all()['roles']) > 0){
-            RolesUsers::where('user_id', $user->id)->delete();
-
             for ($i=0; $i < count($request->all()['roles']); $i++) {
-                RolesUsers::create([
-                    'rol_id' => $request->all()['roles'][$i],
-                    'user_id' => $user->id
-                ]);
+                if(!$request->all()['roles'][$i]['sync']){
+                    RolesUsers::create([
+                        'rol_id' => $request->all()['roles'][$i]['id'],
+                        'user_id' => $user->id
+                    ]);
+                }
+                if($request->all()['roles'][$i]['delete']){
+                    RolesUsers::
+                    where('rol_id', $request->all()['roles'][$i]['id'])
+                    ->where('user_id', $user->id)
+                    ->delete();
+                }
             }
         }
 
