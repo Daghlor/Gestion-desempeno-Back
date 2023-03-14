@@ -14,6 +14,7 @@ class ObjectivesIndividualController extends Controller
     public function Create (Request $request){
         $individual = ObjectivesIndividual::create([
             'unique_id' => Str::uuid()->toString(),
+            'title' => $request->all()['title'],
             'objetive' => $request->all()['objetive'],
             'weight' => $request->all()['weight'],
             'user_id' => auth()->user()->id,
@@ -38,6 +39,7 @@ class ObjectivesIndividualController extends Controller
         $search = $request->all()['search'];
 
         $objetives = ObjectivesIndividual::join('users', 'users.id', '=', 'objectives_individuals.user_id')
+        ->join('objectives_strategics', 'objectives_strategics.id', '=', 'objectives_individuals.strategic_id')
         ->join('states_objectives', 'states_objectives.id', '=', 'objectives_individuals.state_id');
 
         if(count($search) > 0){
@@ -58,8 +60,9 @@ class ObjectivesIndividualController extends Controller
         ->offset(($page-1)*$paginate)
         ->orderBy($column, $direction)
         ->get([
-            'objectives_individuals.unique_id',  'objectives_individuals.objetive', 'objectives_individuals.weight',
-            DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"), 'users.identify', 'states_objectives.description as state'
+            'objectives_individuals.unique_id',  'objectives_individuals.objetive', 'objectives_individuals.weight', 
+            'objectives_individuals.title', 'objectives_strategics.title as title_strategics', 'users.identify',
+            DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"),  'states_objectives.description as state'
         ]);
 
 

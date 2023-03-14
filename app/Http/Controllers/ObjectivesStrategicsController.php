@@ -15,9 +15,10 @@ class ObjectivesStrategicsController extends Controller
     public function Create (Request $request){
         $objetive = ObjectivesStrategics::create([
             'unique_id' => Str::uuid()->toString(),
+            'title' => $request->all()['title'],
             'mission' => $request->all()['mission'],
             'vision' => $request->all()['vision'],
-            'totalWeight' => $request->all()['totalWeight'],
+            'totalWeight' => 0,
             'company_id' => $request->all()['company_id'],
             'user_id' => auth()->user()->id,
             'areas_id' => $request->all()['areas_id'],
@@ -55,24 +56,29 @@ class ObjectivesStrategicsController extends Controller
             if(isset($search['company_id'])){
                 $objetives = $objetives->where('objectives_strategics.company_id', $search['company_id']);
             }
+            if(isset($search['state_id'])){
+                $objetives = $objetives->where('objectives_strategics.state_id', $search['state_id']);
+            }
         }
         $objetives = $objetives->limit($paginate)
         ->offset(($page-1)*$paginate)
         ->orderBy($column, $direction)
         ->get([
-            'objectives_strategics.unique_id',  'objectives_strategics.mission', 'objectives_strategics.vision',
+            'objectives_strategics.unique_id',  'objectives_strategics.title', 'objectives_strategics.mission', 'objectives_strategics.vision',
             'objectives_strategics.totalWeight', 'companies.businessName as company', DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"),
             'users.identify', 'areas.description as area', 'states.description as state'
         ]);
 
-
         $counts = ObjectivesStrategics::join('states', 'states.id', '=', 'objectives_strategics.state_id');
         if(count($search) > 0){
-            if(isset($search['description'])){
-                $counts = $counts->where('areas.description', 'like', '%'.$search['description'].'%');
+            if(isset($search['user_id'])){
+                $counts = $counts->where('objectives_strategics.user_id', $search['user_id']);
+            }
+            if(isset($search['areas_id'])){
+                $counts = $counts->where('objectives_strategics.areas_id', $search['areas_id']);
             }
             if(isset($search['company_id'])){
-                $counts = $counts->where('areas.company_id', $search['company_id']);
+                $counts = $counts->where('objectives_strategics.company_id', $search['company_id']);
             }
         }
         $counts = $counts->get(['objectives_strategics.unique_id']);
