@@ -39,6 +39,7 @@ class EmploymentController extends Controller
         ->get([
             'employments.id', 'employments.unique_id', 'employments.description', 'employments.company_id', 'companies.businessName as company_name'
         ]);
+        
 
         return response()->json(array(
             'res'=> true,
@@ -48,7 +49,7 @@ class EmploymentController extends Controller
 
     public function FindAllPublic (Request $request){
         $employment = Employment::orderBy('description', 'asc')
-        ->where('company_id', null) 
+        ->where('company_id', null)
         ->get([
             'employments.id', 'employments.description'
         ]);
@@ -91,6 +92,17 @@ class EmploymentController extends Controller
         return response()->json(array(
             'res'=> true,
             'data' => 'Cargo Actualizado Correctamente'
+        ), 200);
+    }
+
+    public function Delete (Request $request, $uuid){
+        Employment::where('unique_id', $uuid)->update([
+            'state_id' => 2,
+        ]);
+
+        return response()->json(array(
+            'res'=> true,
+            'data' => 'Información Eliminada Correctamente'
         ), 200);
     }
 

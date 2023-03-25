@@ -71,6 +71,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
         Route::post('getAll', [EmploymentController::class, 'FindAll']);
         Route::get('getOne/{uuid}', [EmploymentController::class, 'FindOne']);
         Route::put('update/{uuid}', [EmploymentController::class, 'Update']);
+        Route::delete('delete/{uuid}', [EmploymentController::class, 'Delete']);
     });
 
     Route::group([
@@ -90,6 +91,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
         Route::post('getAll', [AreaController::class, 'FindAll']);
         Route::get('getOne/{uuid}', [AreaController::class, 'FindOne']);
         Route::put('update/{uuid}', [AreaController::class, 'Update']);
+        Route::delete('delete/{uuid}', [AreaController::class, 'Delete']);
     });
 
     Route::group([

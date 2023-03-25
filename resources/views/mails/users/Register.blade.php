@@ -1,33 +1,76 @@
-<html lang="es">
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
-    <link rel="stylesheet" href="{{ asset('css/mails.css') }}" />
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap');
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="x-apple-disable-message-reformatting">
+  <title></title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style>
+    table, td, div, h1, p {font-family: Arial, sans-serif;}
+  </style>
 </head>
-<body >
-
-    <div style="background-color: #b64a4a; font-family: roboto, Helvetica, sans-serif; 
-        color: rgb(255, 255, 255); font-weight: lighter; width: 100%;">
-        <div style="padding: 3%;">
-            <div style="border: 10px solid rgb(255, 255, 255);"><br>
-                <h1 style="text-align: center">Bienvenido a tu plan de desempeño</h1>
-
-                <div style="margin-left: 30px; margin-right: 30px; text-align: justify;">
-                    Bienvenido {{$name}}, Ya estas registrado en nuestra pagina web gestion de desempeño y 
-                    por tu seguridad, esta contraseña fue generada aletoriamente (Recuerda que la puedes
-                    cambiar en cualquier momento).
-                </div><br>
-            
-                <div style="font-size: 18px; text-align: center; width: 15%; margin-left: auto; margin-right: auto;"> 
-                    <div style="border: 5px solid rgb(255, 255, 255);">
-                        Contraseña {{$pass}}
-                    </div>
-                </div><br><br>
-            </div>
-        </div>
-    </div>
+<body style="margin:0;padding:0;">
+  <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
+    <tr>
+      <td align="center" style="padding:0;">
+        <table role="presentation" style="width:602px;border-collapse:collapse;border:1px solid #cccccc;border-spacing:0;text-align:left;">
+          <tr>
+            <td align="center" style="padding:40px 0 30px 0;background:#70bbd9;">
+              <img src="/Recurso 2.png" alt="" width="300" style="height:auto;display:block;" />
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:36px 30px 42px 30px;">
+              <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                <tr>
+                  <td style="padding:0 0 36px 0;color:#153643;">
+                    <h1 style="font-size:24px;margin:0 0 20px 0;font-family:Arial,sans-serif;">Contraseña generada - GDD - Kometa</h1>
+                    <p style="margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"> Bienvenido {{$name}}, Has sido registrado en nuestra pagina web gestion de desempeño,
+                        recuerda que tu usuario es tu correo y tu contraseña fue generada por el sistema (La podras
+                        cambiar en cualquier momento).</p>
+                    <p style="font-family:Arial,sans-serif; text-align: center;"><a style="color:#ee4c50; text-align: center; width: 15%; margin-left: auto; margin-right: auto;"> Contraseña {{$pass}}</a></p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:30px;background:#ee4c50;">
+              <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;font-size:9px;font-family:Arial,sans-serif;">
+                <tr>
+                  <td style="padding:0;width:50%;" align="left">
+                    <p style="margin:0;font-size:14px;line-height:16px;font-family:Arial,sans-serif;color:#ffffff;">
+                      &reg; Kometa<br/><a href="http://www.example.com" style="color:#ffffff;text-decoration:underline;"></a>
+                    </p>
+                  </td>
+                  <td style="padding:0;width:50%;" align="right">
+                    <table role="presentation" style="border-collapse:collapse;border:0;border-spacing:0;">
+                      <tr>
+                        <td style="padding:0 0 0 10px;width:38px;">
+                          <a href="http://www.twitter.com/" style="color:#ffffff;"><img src="https://assets.codepen.io/210284/tw_1.png" alt="Twitter" width="38" style="height:auto;display:block;border:0;" /></a>
+                        </td>
+                        <td style="padding:0 0 0 10px;width:38px;">
+                          <a href="http://www.facebook.com/" style="color:#ffffff;"><img src="https://assets.codepen.io/210284/fb_1.png" alt="Facebook" width="38" style="height:auto;display:block;border:0;" /></a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>

@@ -99,4 +99,15 @@ class AreaController extends Controller
         ), 200);
     }
 
+    public function Delete (Request $request, $uuid){
+        Area::where('unique_id', $uuid)->update([
+            'state_id' => 2,
+        ]);
+
+        return response()->json(array(
+            'res'=> true,
+            'data' => 'Información Eliminada Correctamente'
+        ), 200);
+    }
+
 }
