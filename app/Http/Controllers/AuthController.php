@@ -8,6 +8,7 @@ use App\Models\Employment;
 use App\Models\ObjectivesIndividual;
 use App\Models\ObjectivesStrategics;
 use App\Models\Roles;
+use App\Models\RolesPermissions;
 use App\Models\RolesUsers;
 use App\Models\State;
 use App\Models\UserHistorial;
@@ -51,6 +52,8 @@ class AuthController extends Controller
         auth()->attempt($credentials);
         $company = [];
         $roles = [];
+        $rolesPermission = [];
+        $validationsPermission = [];
         $permissions = [];
         $totalPoints = 100;
 
@@ -61,7 +64,7 @@ class AuthController extends Controller
         ]);
 
         $points = ObjectivesIndividual::where('user_id', auth()->user()->id)->get(['id', 'weight']);
-        
+      
         if(auth()->user()->company_id){
             $company = Company::where('id', auth()->user()->company_id)->first();
         }
@@ -71,10 +74,25 @@ class AuthController extends Controller
         }
 
        
-
         $roles = RolesUsers::where('user_id', auth()->user()->id)
-        ->join('roles', 'roles.id', '=', 'roles_users.user_id')->get(['roles.id', 'unique_id','description']);
+        ->join('roles', 'roles.id', '=', 'roles_users.user_id')
+        ->get(['roles.id', 'unique_id','description']);
 
+        for ($i=0; $i < count($roles); $i++) {
+            array_push($rolesPermission, RolesPermissions::where('rol_id', $roles[$i]->id)
+            ->join('permissions', 'permissions.id', '=', 'roles_permissions.permissions_id')
+            ->get(['permissions.id', 'permissions.unique_id', 'permissions.description', 'permissions.code']));
+        }
+
+        for ($i=0; $i < count($rolesPermission); $i++) {
+            for ($o=0; $o < count($rolesPermission[$i]); $o++) {
+                if(!in_array($rolesPermission[$i][$o]->id, $validationsPermission, true)){
+                    array_push($validationsPermission, $rolesPermission[$i][$o]->id);
+                    array_push($permissions, $rolesPermission[$i][$o]);
+                }
+            }
+        }
+        
         return response()->json(array(
             'msg'=> 'Iniciando Sesion',
             'token' => $token,
@@ -98,8 +116,8 @@ class AuthController extends Controller
                     'created_at' => auth()->user()->created_at
                 ],
                 'company' => $company,
-                'roles' => $roles
-
+                'roles' => $roles,
+                'permissions' => $permissions
             ],
             'expired' => env('JWT_TTL'),
             'loged' => true,

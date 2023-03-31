@@ -34,16 +34,31 @@ class EmploymentController extends Controller
     }
 
     public function FindAll (Request $request){
+        $paginate = $request->all()['paginate'];
+        $page = $request->all()['page'];
+        $column = $request->all()['column'];
+        $direction = $request->all()['direction'];
+        $search = $request->all()['search'];
+
         $employment = Employment::orderBy('description', 'asc')
         ->leftjoin('companies', 'companies.id', '=', 'employments.company_id')
+        ->limit($paginate)
+        ->offset(($page-1)*$paginate)
+        ->orderBy($column, $direction)
         ->get([
             'employments.id', 'employments.unique_id', 'employments.description', 'employments.company_id', 'companies.businessName as company_name'
         ]);
+
+        $counts = Employment::leftjoin('companies', 'companies.id', '=', 'employments.company_id')->get(['employments.id']);
+
         
 
         return response()->json(array(
             'res'=> true,
-            'data' => $employment,
+            'data' => [
+                'employments' => $employment,
+                'total' => count($counts)
+            ]
         ), 200);
     }
 
