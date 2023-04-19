@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ObjectivesIndividual;
 use App\Models\Tracing;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -22,6 +23,43 @@ class TracingController extends Controller
             'data' => [
                 'roles' => $tracing->unique_id,
                 'msg' => 'Seguimiento Creado Correctamente'
+            ]
+        ), 200);
+    }
+
+    public function FindUserTracing (Request $request){
+        $paginate = $request->all()['paginate'];
+        $page = $request->all()['page'];
+        $column = $request->all()['column'];
+        $direction = $request->all()['direction'];
+        $search = $request->all()['search'];
+
+        $objetives = ObjectivesIndividual::get(['user_id', 'id']);
+        $arrayDataValidate = [];
+        $arrayData = [];
+
+        for ($i=0; $i < count($objetives); $i++) { 
+            if(!in_array($objetives[$i]->user_id, $arrayDataValidate)){
+                array_push($arrayDataValidate, $objetives[$i]->user_id);
+            }
+        }
+
+        $users = User::whereIn('id', $arrayDataValidate)
+        ->limit($paginate)
+        ->offset(($page-1)*$paginate)
+        ->orderBy($column, $direction)
+        ->get([
+            DB::raw("CONCAT(users.name,' ', users.lastName) AS name"), 'users.identify', 'users.email', 'users.company_id', 'users.unique_id'
+        ]);
+
+        $counts = User::whereIn('id', $arrayDataValidate)
+        ->get(['users.identify']);
+        
+        return response()->json(array(
+            'res'=> true,
+            'data' => [
+                'users' => $users,
+                'total' => count($counts)
             ]
         ), 200);
     }
@@ -59,18 +97,33 @@ class TracingController extends Controller
         return response()->json(array(
             'res'=> true,
             'data' => [
-                'areas' => $tracings,
+                'tracings' => $tracings,
                 'total' => count($counts)
             ]
         ), 200);
     }
 
     public function FindOne (Request $request, $uuid){
-        $tracings = Tracing::where('unique_id', $uuid)->first();
+        $user = User::where('unique_id', $uuid)->value('id');
+        $objetives = ObjectivesIndividual::where('objectives_individuals.user_id', $user)
+        ->join('objectives_strategics', 'objectives_strategics.id', '=', 'objectives_individuals.strategic_id')
+        ->join('states_objectives', 'states_objectives.id', '=', 'objectives_individuals.state_id')
+        ->get([
+            'objectives_individuals.id', 'objectives_individuals.unique_id', 'objectives_individuals.title', 
+            'objectives_individuals.objetive', 'objectives_strategics.title as title_strategics',
+            'objectives_individuals.weight', 'objectives_individuals.strategic_id', 'objectives_individuals.state_id', 
+            'objectives_individuals.created_at', 'states_objectives.description as state'
+        ]);
+
+        for ($i=0; $i < count($objetives); $i++) { 
+            $objetives[$i]['tracing'] = Tracing::where('individual_id', $objetives[$i]->id)->get();
+        }
+
+        //$objetives->objectivesStrategics = ObjectivesStrategics::where('id', $objetives->strategic_id)->first();
       
         return response()->json(array(
             'res'=> true,
-            'data' => $tracings
+            'data' => $objetives
         ), 200);
     }
 
