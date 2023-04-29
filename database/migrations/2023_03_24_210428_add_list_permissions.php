@@ -15,13 +15,6 @@ return new class extends Migration
      */
     public function up()
     {
-        Roles::create([
-            'id' => 3,
-            'unique_id' => Str::uuid()->toString(),
-            'description' => 'Super Administrador',
-        ]);
-
-
         Permissions::create([
             'id' => 1,
             'unique_id' => Str::uuid()->toString(),
@@ -192,7 +185,28 @@ return new class extends Migration
             'code' => 'get_all_data'
         ]);
 
-        for ($i=1; $i < 27; $i++) {
+        Permissions::create([
+            'id' => 27,
+            'unique_id' => Str::uuid()->toString(),
+            'description' => 'Listar Roles',
+            'code' => 'list_roles'
+        ]);
+
+        Permissions::create([
+            'id' => 28,
+            'unique_id' => Str::uuid()->toString(),
+            'description' => 'Actualizar Roles',
+            'code' => 'update_roles'
+        ]);
+
+        Permissions::create([
+            'id' => 29,
+            'unique_id' => Str::uuid()->toString(),
+            'description' => 'Listar Permisos',
+            'code' => 'list_permissions'
+        ]);
+
+        for ($i=1; $i < 30; $i++) {
             if($i != 18 || $i != 22){
                 RolesPermissions::create([
                     'rol_id' => 3,

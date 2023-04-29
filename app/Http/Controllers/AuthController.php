@@ -76,10 +76,10 @@ class AuthController extends Controller
        
         $roles = RolesUsers::where('user_id', auth()->user()->id)
         ->join('roles', 'roles.id', '=', 'roles_users.user_id')
-        ->get(['roles.id', 'unique_id','description']);
+        ->get(['roles_users.rol_id', 'unique_id', 'description']);
 
         for ($i=0; $i < count($roles); $i++) {
-            array_push($rolesPermission, RolesPermissions::where('rol_id', $roles[$i]->id)
+            array_push($rolesPermission, RolesPermissions::where('rol_id', $roles[$i]->rol_id)
             ->join('permissions', 'permissions.id', '=', 'roles_permissions.permissions_id')
             ->get(['permissions.id', 'permissions.unique_id', 'permissions.description', 'permissions.code']));
         }
@@ -117,7 +117,8 @@ class AuthController extends Controller
                 ],
                 'company' => $company,
                 'roles' => $roles,
-                'permissions' => $permissions
+                'permissions' => $permissions,
+                'auth' => auth()->user()
             ],
             'expired' => env('JWT_TTL'),
             'loged' => true,
@@ -132,8 +133,10 @@ class AuthController extends Controller
         $companies = [];
         $roles = [];
 
+        $validateSuperAdmin = RolesUsers::where('user_id', auth()->user()->id)->where('rol_id', 3)->count();
         $validateAdmin = RolesUsers::where('user_id', auth()->user()->id)->where('rol_id', 1)->count();
-        if($validateAdmin > 0){
+
+        if($validateSuperAdmin > 0){
             $employments = Employment::get(['id', 'description', 'company_id']);
             $areas = Area::get(['id', 'description', 'company_id']);
             $strategics = ObjectivesStrategics::get(['id', 'title', 'company_id']);
@@ -144,6 +147,13 @@ class AuthController extends Controller
                 $employments = Employment::where('company_id', auth()->user()->company_id)->get(['id', 'description', 'company_id']);
                 $areas = Area::where('company_id', auth()->user()->company_id)->get(['id', 'description', 'company_id']);
                 $strategics = ObjectivesStrategics::where('company_id', auth()->user()->company_id)->get(['id', 'title', 'company_id']);
+                $companies = Company::where('id', auth()->user()->company_id)->get(['id', 'businessName']);
+            }
+
+            if($validateAdmin > 0){
+                $roles = Roles::get(['id', 'description']);
+            }else{
+                $roles = Roles::where('id', '!=', 3)->get(['id', 'description']);
             }
         }
 

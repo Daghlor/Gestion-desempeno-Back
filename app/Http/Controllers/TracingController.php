@@ -21,7 +21,7 @@ class TracingController extends Controller
         return response()->json(array(
             'res'=> true,
             'data' => [
-                'roles' => $tracing->unique_id,
+                'tracing' => $tracing->unique_id,
                 'msg' => 'Seguimiento Creado Correctamente'
             ]
         ), 200);
@@ -71,7 +71,6 @@ class TracingController extends Controller
         $direction = $request->all()['direction'];
         $search = $request->all()['search'];
 
-
         $tracings = Tracing::leftjoin('users', 'users.id', '=', 'tracings.user_id');
         if(count($search) > 0){
             if(isset($search['individual_id'])){
@@ -104,8 +103,8 @@ class TracingController extends Controller
     }
 
     public function FindOne (Request $request, $uuid){
-        $user = User::where('unique_id', $uuid)->value('id');
-        $objetives = ObjectivesIndividual::where('objectives_individuals.user_id', $user)
+        $user = User::where('unique_id', $uuid)->first(['id', 'name', 'lastName', 'identify', 'phone', 'email']);
+        $objetives = ObjectivesIndividual::where('objectives_individuals.user_id', $user->id)
         ->join('objectives_strategics', 'objectives_strategics.id', '=', 'objectives_individuals.strategic_id')
         ->join('states_objectives', 'states_objectives.id', '=', 'objectives_individuals.state_id')
         ->get([
@@ -116,14 +115,13 @@ class TracingController extends Controller
         ]);
 
         for ($i=0; $i < count($objetives); $i++) { 
-            $objetives[$i]['tracing'] = Tracing::where('individual_id', $objetives[$i]->id)->get();
+            $objetives[$i]['tracing'] = Tracing::where('individual_id', $objetives[$i]->id)->orderBy('created_at', 'desc')->get();
         }
-
-        //$objetives->objectivesStrategics = ObjectivesStrategics::where('id', $objetives->strategic_id)->first();
       
         return response()->json(array(
             'res'=> true,
-            'data' => $objetives
+            'data' => $objetives,
+            'user' => $user
         ), 200);
     }
 
