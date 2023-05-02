@@ -202,6 +202,9 @@ class UsersController extends Controller
             if(isset($search['state_id'])  && $search['state_id'] != 0){
                 $users = $users->where('users.state_id', $search['state_id']);
             }
+            if(isset($search['companie_id'])){
+                $users = $users->where('companies.id', $search['companie_id']);
+            }
         }
         $users = $users->limit($paginate)
         ->offset(($page-1)*$paginate)

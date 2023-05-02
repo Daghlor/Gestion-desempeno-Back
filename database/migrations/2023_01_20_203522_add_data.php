@@ -60,6 +60,12 @@ return new class extends Migration
             'description' => 'Empleado',
         ]);
 
+        Roles::create([
+            'id' => 3,
+            'unique_id' => Str::uuid()->toString(),
+            'description' => 'Super Administrador',
+        ]);
+
         User::create([
             'id' => 1,
             'unique_id' => Str::uuid()->toString(),
@@ -80,13 +86,9 @@ return new class extends Migration
         ]);
 
         RolesUsers::create([
-            'rol_id' => 1,
+            'rol_id' => 3,
             'user_id' => 1
         ]);
-
-
-
-
 
     }
 
