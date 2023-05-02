@@ -51,7 +51,7 @@ class EmploymentController extends Controller
 
         $counts = Employment::leftjoin('companies', 'companies.id', '=', 'employments.company_id')->get(['employments.id']);
 
-        
+
 
         return response()->json(array(
             'res'=> true,
@@ -120,5 +120,4 @@ class EmploymentController extends Controller
             'data' => 'Información Eliminada Correctamente'
         ), 200);
     }
-
 }
