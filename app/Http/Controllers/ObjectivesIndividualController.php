@@ -11,7 +11,8 @@ use Illuminate\Support\Str;
 
 class ObjectivesIndividualController extends Controller
 {
-    public function Create (Request $request){
+    public function Create(Request $request)
+    {
         $individual = ObjectivesIndividual::create([
             'unique_id' => Str::uuid()->toString(),
             'title' => $request->all()['title'],
@@ -23,7 +24,7 @@ class ObjectivesIndividualController extends Controller
         ]);
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => [
                 'objetive' => $individual->unique_id,
                 'msg' => 'Objetivo Individual Creado Correctamente'
@@ -31,7 +32,8 @@ class ObjectivesIndividualController extends Controller
         ), 200);
     }
 
-    public function FindAll (Request $request){
+    public function FindAll(Request $request)
+    {
         $paginate = $request->all()['paginate'];
         $page = $request->all()['page'];
         $column = $request->all()['column'];
@@ -39,52 +41,52 @@ class ObjectivesIndividualController extends Controller
         $search = $request->all()['search'];
 
         $objetives = ObjectivesIndividual::join('users', 'users.id', '=', 'objectives_individuals.user_id')
-        ->join('objectives_strategics', 'objectives_strategics.id', '=', 'objectives_individuals.strategic_id')
-        ->join('states_objectives', 'states_objectives.id', '=', 'objectives_individuals.state_id');
+            ->join('objectives_strategics', 'objectives_strategics.id', '=', 'objectives_individuals.strategic_id')
+            ->join('states_objectives', 'states_objectives.id', '=', 'objectives_individuals.state_id');
 
-        if(count($search) > 0){
-            if(isset($search['objetive'])){
-                $objetives = $objetives->where('objectives_individuals.objetive', 'like', '%'.$search['objetive'].'%');
+        if (count($search) > 0) {
+            if (isset($search['objetive'])) {
+                $objetives = $objetives->where('objectives_individuals.objetive', 'like', '%' . $search['objetive'] . '%');
             }
-            if(isset($search['user_id'])){
+            if (isset($search['user_id'])) {
                 $objetives = $objetives->where('objectives_individuals.user_id', $search['user_id']);
             }
-            if(isset($search['areas_id'])){
+            if (isset($search['areas_id'])) {
                 $objetives = $objetives->where('objectives_individuals.areas_id', $search['areas_id']);
             }
-            if(isset($search['strategic_id'])){
+            if (isset($search['strategic_id'])) {
                 $objetives = $objetives->where('objectives_individuals.strategic_id', $search['strategic_id']);
             }
         }
         $objetives = $objetives->limit($paginate)
-        ->offset(($page-1)*$paginate)
-        ->orderBy($column, $direction)
-        ->get([
-            'objectives_individuals.unique_id',  'objectives_individuals.objetive', 'objectives_individuals.weight', 
-            'objectives_individuals.title', 'objectives_strategics.title as title_strategics', 'users.identify',
-            DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"),  'states_objectives.description as state'
-        ]);
+            ->offset(($page - 1) * $paginate)
+            ->orderBy($column, $direction)
+            ->get([
+                'objectives_individuals.unique_id',  'objectives_individuals.objetive', 'objectives_individuals.weight',
+                'objectives_individuals.title', 'objectives_strategics.title as title_strategics', 'users.identify',
+                DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"),  'states_objectives.description as state'
+            ]);
 
 
         $counts = ObjectivesIndividual::join('states', 'states.id', '=', 'objectives_individuals.state_id');
-        if(count($search) > 0){
-            if(isset($search['objetive'])){
-                $counts = $counts->where('objectives_individuals.objetive', 'like', '%'.$search['objetive'].'%');
+        if (count($search) > 0) {
+            if (isset($search['objetive'])) {
+                $counts = $counts->where('objectives_individuals.objetive', 'like', '%' . $search['objetive'] . '%');
             }
-            if(isset($search['user_id'])){
+            if (isset($search['user_id'])) {
                 $counts = $counts->where('objectives_individuals.user_id', $search['user_id']);
             }
-            if(isset($search['areas_id'])){
+            if (isset($search['areas_id'])) {
                 $counts = $counts->where('objectives_individuals.areas_id', $search['areas_id']);
             }
-            if(isset($search['strategic_id'])){
+            if (isset($search['strategic_id'])) {
                 $counts = $counts->where('objectives_individuals.strategic_id', $search['strategic_id']);
             }
         }
         $counts = $counts->get(['objectives_individuals.unique_id']);
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => [
                 'objetives' => $objetives,
                 'total' => count($counts)
@@ -92,15 +94,56 @@ class ObjectivesIndividualController extends Controller
         ), 200);
     }
 
-    public function FindOne (Request $request, $uuid){
+    public function countAll()
+    {
+
+        $objetives = ObjectivesIndividual::join('users', 'users.id', '=', 'objectives_individuals.user_id')
+            ->join('objectives_strategics', 'objectives_strategics.id', '=', 'objectives_individuals.strategic_id')
+            ->join('states_objectives', 'states_objectives.id', '=', 'objectives_individuals.state_id')
+            ->get([
+                'objectives_individuals.unique_id',  'objectives_individuals.objetive', 'objectives_individuals.weight',
+                'objectives_individuals.title', 'objectives_strategics.title as title_strategics', 'users.identify',
+                DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"),  'states_objectives.description as state'
+            ]);
+
+        return response()->json(array(
+            'res' => true,
+            'data' => [
+                'objetives' => $objetives,
+                'total' => count($objetives)
+            ]
+        ), 200);
+    }
+
+    public function FindOne(Request $request, $uuid)
+    {
         $objetives = ObjectivesIndividual::where('objectives_individuals.unique_id', $uuid)->first();
         $objetives->user = User::where('id', $objetives->user_id)->first(['unique_id', 'name', 'lastName', 'identify', 'phone', 'email']);
         $objetives->objectivesStrategics = ObjectivesStrategics::where('id', $objetives->strategic_id)->first();
-    
+
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => $objetives
         ), 200);
     }
 
+    public function Delete(Request $request, $uuid)
+    {
+        ObjectivesIndividual::where('unique_id', $uuid)
+            ->update([
+                'state_id' => 2,
+            ]);
+
+        return response()->json(array(
+            'res' => true,
+            'data' => 'Objetivo Individual Eliminando Correctamente'
+        ), 200);
+    }
+
+    public function getTotalObjectivesIndividuals()
+    {
+        $total = ObjectivesIndividual::count();
+
+        return $total;
+    }
 }

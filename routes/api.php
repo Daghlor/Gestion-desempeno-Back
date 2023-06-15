@@ -6,6 +6,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmploymentController;
 use App\Http\Controllers\ObjectivesIndividualController;
 use App\Http\Controllers\ObjectivesStrategicsController;
+use App\Http\Controllers\PercentageController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\TracingController;
 use App\Http\Controllers\UsersController;
@@ -36,7 +37,7 @@ Route::group([
     Route::get('companies', [CompanyController::class, 'FindAllPublic']);
 });
 
-Route::group(['middleware' => ['jwt.verify']], function() {
+Route::group(['middleware' => ['jwt.verify']], function () {
 
     Route::group([
         'prefix' => 'auth'
@@ -101,6 +102,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
         Route::post('getAll', [ObjectivesStrategicsController::class, 'FindAll']);
         Route::get('getOne/{uuid}', [ObjectivesStrategicsController::class, 'FindOne']);
         Route::delete('delete/{uuid}', [ObjectivesStrategicsController::class, 'Delete']);
+        Route::post('countAll', [ObjectivesStrategicsController::class, 'getTotalObjectivesStrategics']);
     });
 
     Route::group([
@@ -109,6 +111,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
         Route::post('create', [ObjectivesIndividualController::class, 'Create']);
         Route::post('getAll', [ObjectivesIndividualController::class, 'FindAll']);
         Route::get('getOne/{uuid}', [ObjectivesIndividualController::class, 'FindOne']);
+        Route::delete('delete/{uuid}', [ObjectivesIndividualController::class, 'Delete']);
     });
 
     Route::group([
@@ -120,6 +123,11 @@ Route::group(['middleware' => ['jwt.verify']], function() {
         Route::get('getOne/{uuid}', [TracingController::class, 'FindOne']);
     });
 
+    Route::group([
+        'prefix' => 'percentage'
+    ], function ($router) {
+        Route::get('calculate', [PercentageController::class, 'calculatePercentage']);
+    });
 });
 
 

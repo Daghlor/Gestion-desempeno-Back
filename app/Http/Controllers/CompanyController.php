@@ -52,7 +52,7 @@ class CompanyController extends Controller
             ]);
         }
 
-        for ($i=0; $i < count($request->all()['colors']); $i++) { 
+        for ($i=0; $i < count($request->all()['colors']); $i++) {
             ColorsCompany::create([
                 'unique_id' => Str::uuid()->toString().'-'.$request->all()['nit'].'-'.$i,
                 'label' => $request->all()['colors'][$i]['label'],
@@ -63,7 +63,7 @@ class CompanyController extends Controller
                 'company_id' => $company->id
             ]);
         }
-       
+
         return response()->json(array(
             'res'=> true,
             'data' => [
@@ -108,7 +108,7 @@ class CompanyController extends Controller
         ->offset(($page-1)*$paginate)
         ->orderBy($column, $direction)
         ->get([
-            'companies.unique_id', 'companies.nit', 'companies.businessName', 'companies.phone', 
+            'companies.unique_id', 'companies.nit', 'companies.businessName', 'companies.phone',
             'companies.email', 'companies.address', 'companies.city', 'states.description as state',
         ]);
 
@@ -174,9 +174,9 @@ class CompanyController extends Controller
         ->join('states', 'states.id', '=', 'users.state_id')
         ->join('employments', 'employments.id', '=', 'users.employment_id')
         ->get([
-            'users.id', 'users.unique_id', 'users.photo', 'users.name', 'users.lastName', 'users.identify', 'users.phone', 
+            'users.id', 'users.unique_id', 'users.photo', 'users.name', 'users.lastName', 'users.identify', 'users.phone',
             'users.email', 'users.address', 'users.city', 'users.verify', 'users.dateBirth', 'users.employment_id',
-            'users.created_at', 'states.description as state', 'employments.description as employment', 
+            'users.created_at', 'states.description as state', 'employments.description as employment',
         ]);
         $companies->employments = Employment::where('company_id', $companies->id)->get();
         $companies->strategics = ObjectivesStrategics::where('objectives_strategics.company_id', $companies->id)
@@ -184,7 +184,7 @@ class CompanyController extends Controller
         ->join('users', 'users.id', '=', 'objectives_strategics.user_id')
         ->join('states', 'states.id', '=', 'objectives_strategics.state_id')
         ->get([
-            'objectives_strategics.id', 'objectives_strategics.unique_id', 'objectives_strategics.title', 
+            'objectives_strategics.id', 'objectives_strategics.unique_id', 'objectives_strategics.title',
             'objectives_strategics.mission', 'objectives_strategics.vision', 'objectives_strategics.totalWeight',
             'objectives_strategics.company_id', 'objectives_strategics.user_id', 'objectives_strategics.areas_id',
             'objectives_strategics.state_id', 'states.description as state', DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"),
@@ -214,7 +214,7 @@ class CompanyController extends Controller
         if(isset($request->all()['logo'])){
             $UrlImg = PhotoHelper::uploadBase64($request->all()['logo'], 'company_'.$request->all()['nit'].'_'.$request->all()['businessName'], 'companies');
         }
-        
+
         Company::where('unique_id', $uuid)
         ->update([
             'nit' => $request->all()['nit'],
@@ -282,19 +282,19 @@ class CompanyController extends Controller
                         'company_id' => $users['company_id'],
                         'state_id' => 1,
                     ]);
-    
+
                     $dataEmail = [
                         'name' => $users['name'].' '.$users['lastName'],
                         'code' => $codeVerify,
                         'pass' => $password
                     ];
-            
+
                     EmailHelper::sendMail('mails.users.Register', $dataEmail, $users['email'], "Contraseña - Gestion Desempeño");
                     EmailHelper::sendMail('mails.users.Verify', $dataEmail, $users['email'], "Codigo de verificación - Gestion Desempeño");
                 }else{
                     $notSaveUsers = $notSaveUsers + 1;
                 }
-        
+
             }
 
             if($users['update']){
@@ -316,7 +316,7 @@ class CompanyController extends Controller
                     'state_id' => 2,
                 ]);
             }
-            
+
         }
 
 
@@ -342,7 +342,7 @@ class CompanyController extends Controller
                     'state_id' => 2
                 ]);
             }
-            
+
         }
 
         for ($i=0; $i < count($request->all()['employments']); $i++) {
@@ -360,7 +360,7 @@ class CompanyController extends Controller
                 }else{
                     $notSaveEmployments = $notSaveEmployments + 1;
                 }
-               
+
             }
 
             if($employment['update']){
@@ -394,9 +394,9 @@ class CompanyController extends Controller
                     'company_id' => $area['company_id'],
                 ]);
             }
-            
+
         }
-       
+
         return response()->json(array(
             'res'=> true,
             'data' => 'Empresa Actualizada Correctamente'
