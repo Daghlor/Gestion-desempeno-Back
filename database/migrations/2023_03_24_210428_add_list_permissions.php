@@ -39,8 +39,6 @@ return new class extends Migration
             'description' => 'Eliminar Empresas',
             'code' => 'delete_companies'
         ]);
-
-
         Permissions::create([
             'id' => 5,
             'unique_id' => Str::uuid()->toString(),
@@ -65,8 +63,6 @@ return new class extends Migration
             'description' => 'Eliminar Usuarios',
             'code' => 'delete_users'
         ]);
-
-
         Permissions::create([
             'id' => 9,
             'unique_id' => Str::uuid()->toString(),
@@ -91,8 +87,6 @@ return new class extends Migration
             'description' => 'Eliminar Cargos',
             'code' => 'delete_employments'
         ]);
-
-
         Permissions::create([
             'id' => 13,
             'unique_id' => Str::uuid()->toString(),
@@ -117,8 +111,6 @@ return new class extends Migration
             'description' => 'Eliminar Áreas',
             'code' => 'delete_areas'
         ]);
-
-
         Permissions::create([
             'id' => 17,
             'unique_id' => Str::uuid()->toString(),
@@ -143,8 +135,6 @@ return new class extends Migration
             'description' => 'Eliminar Objetivos Estratégicos',
             'code' => 'delete_objectives_strategics'
         ]);
-
-
         Permissions::create([
             'id' => 21,
             'unique_id' => Str::uuid()->toString(),
@@ -163,21 +153,18 @@ return new class extends Migration
             'description' => 'Crear Objetivos Individuales',
             'code' => 'create_objectives_individuals'
         ]);
-
         Permissions::create([
             'id' => 24,
             'unique_id' => Str::uuid()->toString(),
             'description' => 'Listar Seguimientos',
             'code' => 'list_tracings'
         ]);
-
         Permissions::create([
             'id' => 25,
             'unique_id' => Str::uuid()->toString(),
             'description' => 'Crear Seguimientos',
             'code' => 'create_tracings'
         ]);
-
         Permissions::create([
             'id' => 26,
             'unique_id' => Str::uuid()->toString(),
@@ -214,8 +201,7 @@ return new class extends Migration
                 ]);
             }
         }
-
-        for ($i=5; $i < 26; $i++) { 
+        for ($i=5; $i < 26; $i++) {
             if($i != 21 || $i != 22 || $i != 23){
                 RolesPermissions::create([
                     'rol_id' => 1,
@@ -223,18 +209,14 @@ return new class extends Migration
                 ]);
             }
         }
-
         RolesPermissions::create([
             'rol_id' => 2,
             'permissions_id' => 22,
         ]);
-
         RolesPermissions::create([
             'rol_id' => 2,
             'permissions_id' => 23,
         ]);
-
-
     }
 
     /**
