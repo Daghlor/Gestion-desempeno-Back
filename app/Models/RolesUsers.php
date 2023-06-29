@@ -1,5 +1,6 @@
 <?php
 
+// MODELO DE LA TABLA ROLES DE USUARIO CON SUS COLUMNAS
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;

@@ -1,5 +1,6 @@
 <?php
 
+// MIGRACION PARA CREAR LA TABLA PERMISOS DE ROLES CON SUS COLUMNAS Y CON SUS LLAVES FORANEAS A OTRAS TABLAS
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

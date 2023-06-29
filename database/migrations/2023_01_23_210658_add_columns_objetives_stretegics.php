@@ -1,5 +1,6 @@
 <?php
 
+// MIGRACION PARA AGREGAR COLUMNAS A LA TABLA OBJETIVOS ESTRATEGICOS YA CREADA
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

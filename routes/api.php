@@ -1,5 +1,8 @@
 <?php
 
+// APARTADO DONDE SE ENCUENTRAN TODAS LAS RUTAS DE LAS APIS CREADAS EN LOS CONTROLADORES,
+// CADA UNA AGRUPADA DE ACUERDO A SU CONTROLADOR RESPECTIVO
+
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CompanyController;
@@ -11,7 +14,9 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\TracingController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route as RoutingRoute;
 use Illuminate\Support\Facades\Route;
+use Symfony\Component\Routing\Annotation\Route as AnnotationRoute;
 
 //Create
 //FindAll
@@ -98,11 +103,11 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     Route::group([
         'prefix' => 'strategics'
     ], function ($router) {
+        Route::get('countAll', [ObjectivesStrategicsController::class, 'getTotalObjectivesStrategics']);
         Route::post('create', [ObjectivesStrategicsController::class, 'Create']);
         Route::post('getAll', [ObjectivesStrategicsController::class, 'FindAll']);
         Route::get('getOne/{uuid}', [ObjectivesStrategicsController::class, 'FindOne']);
         Route::delete('delete/{uuid}', [ObjectivesStrategicsController::class, 'Delete']);
-        Route::post('countAll', [ObjectivesStrategicsController::class, 'getTotalObjectivesStrategics']);
     });
 
     Route::group([
@@ -126,7 +131,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     Route::group([
         'prefix' => 'percentage'
     ], function ($router) {
-        Route::get('calculate', [PercentageController::class, 'calculatePercentage']);
+        Route::post('calculatePercentage/{uniqueId}', [PercentageController::class, 'calculatePercentage']);
     });
 });
 

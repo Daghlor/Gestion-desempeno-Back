@@ -1,5 +1,6 @@
 <?php
 
+// MODELO DE LA TABLA COLRES DE EMPRESA CON SUS COLUMNAS
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;

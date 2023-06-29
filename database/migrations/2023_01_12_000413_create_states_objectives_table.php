@@ -1,5 +1,6 @@
 <?php
 
+// MIGRACION PARA CREAR LA TABLA ESTADOS DE OBJETIVOS CON SUS COLUMNAS
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

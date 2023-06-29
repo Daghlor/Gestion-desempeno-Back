@@ -1,5 +1,6 @@
 <?php
 
+// MIGRACION PARA ACTUALIZAR COLUMNAS A DOS TABLAS YA CREADAS
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

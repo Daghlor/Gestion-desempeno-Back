@@ -1,5 +1,6 @@
 <?php
 
+// MIGRACION PARA CREAR LA TABLA COLORES DE EMPRESA CON SUS COLUMNAS Y LLAVE FORANEA A OTRA TABLA
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

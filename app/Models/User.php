@@ -1,5 +1,6 @@
 <?php
 
+// MODELO DE LA TABLA USUARIOS CON SUS COLUMNAS
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -32,11 +33,13 @@ class User extends Authenticatable implements JWTSubject
         'state_id'
     ];
 
-    public function getJWTIdentifier(){
+    public function getJWTIdentifier()
+    {
         return $this->getKey();
     }
 
-    public function getJWTCustomClaims(){
+    public function getJWTCustomClaims()
+    {
         return [];
     }
 }

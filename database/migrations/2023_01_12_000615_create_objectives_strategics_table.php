@@ -1,5 +1,6 @@
 <?php
 
+// MIGRACION PARA CREAR LA TABLA OBJETIVOS ESTRATEGICOS CON SUS COLUMNAS Y SUS LLAVES FORANEAS A OTRAS TABLAS
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

@@ -1,5 +1,7 @@
 <?php
 
+// ESTE ES EL CONTROLADOR DE OBJETIVOS ESTRATEGICOS DONDE ESTAN LAS FUNCIONES DE TIPO CRUD
+
 namespace App\Http\Controllers;
 
 use App\Models\Area;
@@ -13,6 +15,7 @@ use Illuminate\Support\Str;
 
 class ObjectivesStrategicsController extends Controller
 {
+    // FUNCION PARA CREAR O REGSITRAR UN OBJETIVO ESTRATEGICO
     public function Create(Request $request)
     {
         $objetive = ObjectivesStrategics::create([
@@ -36,6 +39,7 @@ class ObjectivesStrategicsController extends Controller
         ), 200);
     }
 
+    // FUNCION PARA TRAER O BUSCAR TODOS LOS OBJETIVOS ESTRATEGICOS QUE SE HAYAN REGISTRADO
     public function FindAll(Request $request)
     {
         $paginate = $request->all()['paginate'];
@@ -86,15 +90,22 @@ class ObjectivesStrategicsController extends Controller
         }
         $counts = $counts->get(['objectives_strategics.unique_id']);
 
-        return response()->json(array(
-            'res' => true,
-            'data' => [
-                'objetives' => $objetives,
-                'total' => count($counts)
-            ]
-        ), 200);
+        $total = count($counts);
+        return response()->json(
+            [
+                'res' => true,
+                'data' => [
+                    'objetives' => $objetives,
+                    'total' => $total,
+                ]
+            ],
+            200
+        );
     }
 
+
+
+    // FUNCION PARA BUSCAR UN SOLO OBJETIVO ESTRATEGICO POR SU UNIQUE_ID
     public function FindOne(Request $request, $uuid)
     {
         $objetives = ObjectivesStrategics::where('objectives_strategics.unique_id', $uuid)->join('companies', 'companies.id', '=', 'objectives_strategics.company_id')->first();
@@ -109,7 +120,7 @@ class ObjectivesStrategicsController extends Controller
         ), 200);
     }
 
-
+    // FUNCION PARA BORRAR UN OBEJTIVO ESTRATEGICO
     public function Delete(Request $request, $uuid)
     {
         ObjectivesStrategics::where('unique_id', $uuid)
@@ -120,15 +131,6 @@ class ObjectivesStrategicsController extends Controller
         return response()->json(array(
             'res' => true,
             'data' => 'Objetivo Estratégico Eliminado Correctamente'
-        ), 200);
-    }
-
-    public function getTotalObjectivesStrategics()
-    {
-        $total = ObjectivesStrategics::count();
-
-        return response()->json(array(
-            'data' => $total,
         ), 200);
     }
 }

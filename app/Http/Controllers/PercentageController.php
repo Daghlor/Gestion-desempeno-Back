@@ -3,23 +3,33 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\ObjectivesIndividualController;
+use Illuminate\Http\Request;
 use App\Http\Controllers\ObjectivesStrategicsController;
+use App\Http\Controllers\ObjectivesIndividualController;
 
 class PercentageController extends Controller
 {
-    public function calculatePercentage()
+    public function calculatePercentage(Request $request, $strategicId)
     {
-        $objectivesIndividualController = new ObjectivesIndividualController();
-        $objectivesStrategicsController = new ObjectivesStrategicsController();
+        $strategicsController = new ObjectivesStrategicsController();
+        $strategicsResponse = $strategicsController->FindAll($request);
+        $totalStrategics = $strategicsResponse->getData()->data->total;
 
-        $totalIndividuals = $objectivesIndividualController->getTotalObjectivesIndividuals();
-        $totalStrategics = $objectivesStrategicsController->getTotalObjectivesStrategics();
+        $individualController = new ObjectivesIndividualController();
+        $individualsResponse = $individualController->FindAll($request);
+        $totalIndividuals = $individualsResponse->getData()->data->total;
 
-        $percentage = ($totalIndividuals / $totalStrategics) * 100;
+        $totalTargetedResponse = $individualController->FindTargeted($request, $strategicId);
+        $totalTargeted = $totalTargetedResponse->getData()->data->total_targeted ?? 0;
 
-        return response()->json(array(
-            'percentage' => $percentage,
-        ), 200);
+
+        $percentage = ($totalIndividuals > 0) ? ($totalTargeted / $totalIndividuals) * 100 : 0;
+
+        return response()->json([
+            'total_strategics' => $totalStrategics,
+            'total_individuals' => $totalIndividuals,
+            'targeted_individuals' => $totalTargeted,
+            'percentage' => $percentage
+        ], 200);
     }
 }

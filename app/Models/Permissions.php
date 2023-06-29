@@ -1,5 +1,6 @@
 <?php
 
+// MODELO DE LA TABLA PERMISOS CON SUS COLUMNAS
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;

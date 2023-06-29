@@ -1,5 +1,8 @@
 <?php
 
+// ESTE ES EL CONTROLADOR DE USUARIOS DONDE ESTAN LAS FUNCIONES DE TIPO CRUD Y OTRAS FUNCIONES PARA USUARIOS, ES OTRO DE LAS MAS IMPORTANTES
+
+
 namespace App\Http\Controllers;
 
 use ADP\Helpers\EmailHelper;
@@ -15,13 +18,15 @@ use Illuminate\Support\Str;
 class UsersController extends Controller
 {
 
-    public function verify (Request $request){
+    // FUNCION PARA LA VERIFICIACION DE USUARIO Y DE ENVIO DEL CODIGO DE VERIFICACION
+    public function verify(Request $request)
+    {
         $user = auth()->user();
         $decryp = Hash::check($request->all()['code'], $user->codeVerify);
 
-        if(!$decryp){
+        if (!$decryp) {
             return response()->json(array(
-                'res'=> false,
+                'res' => false,
                 'data' => 'Codigo Invalido'
             ), 200);
         }
@@ -32,18 +37,20 @@ class UsersController extends Controller
         ]);
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' =>  'Usuario Verificado Correctamente'
         ), 200);
     }
 
-    public function registerPublic (Request $request){
+    // FUNCION PARA EL REGISTRO PUBLICO DE UN USUARIO
+    public function registerPublic(Request $request)
+    {
         $validate = User::where('identify', $request->all()['identify'])
             ->orWhere('email', $request->all()['email'])
             ->orWhere('phone', $request->all()['phone'])
             ->first();
 
-        if(isset($validate) == true){
+        if (isset($validate) == true) {
             return response()->json(array(
                 'data' => 'Ya existe un usuario con el mismo telefono, email o identificación',
                 'res' => false
@@ -52,8 +59,8 @@ class UsersController extends Controller
 
         $codeVerify = random_int(100000, 999999);
         $UrlImg = "";
-        if(isset($request->all()['photo'])){
-            $UrlImg = PhotoHelper::uploadBase64($request->all()['photo'], 'user_'.$request->all()['identify'], 'users');
+        if (isset($request->all()['photo'])) {
+            $UrlImg = PhotoHelper::uploadBase64($request->all()['photo'], 'user_' . $request->all()['identify'], 'users');
         }
 
         $user = User::create([
@@ -69,12 +76,12 @@ class UsersController extends Controller
             'verify' => 0,
             'codeVerify' => bcrypt($codeVerify),
             'dateBirth' => $request->all()['dateBirth'],
-            'employment_id' => 2, 
+            'employment_id' => 2,
             'company_id' => null,
             'state_id' => 1,
         ]);
 
-        if($UrlImg != ""){
+        if ($UrlImg != "") {
             User::where('unique_id', $user->unique_id)->update([
                 'photo' => $UrlImg,
             ]);
@@ -86,7 +93,7 @@ class UsersController extends Controller
         ]);
 
         $dataEmail = [
-            'name' => $request->all()['name'].' '.$request->all()['lastName'],
+            'name' => $request->all()['name'] . ' ' . $request->all()['lastName'],
             'code' => $codeVerify,
         ];
 
@@ -95,7 +102,7 @@ class UsersController extends Controller
         //EmailHelper::sendMail('mails.users.Verify', $dataEmail, $request->all()['email'], "Codigo de verificación - Gestion Desempeño");
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => [
                 'unique_id' => $user->unique_id,
                 'msg' => 'Usuario Creado Correctamente'
@@ -104,13 +111,14 @@ class UsersController extends Controller
     }
 
     //FUNCION PARA REGISTRAR UN USUARIO DESDE UN ADMINISTRADOR
-    public function registerAdmin (Request $request){
+    public function registerAdmin(Request $request)
+    {
         $validate = User::where('identify', $request->all()['identify'])
             ->orWhere('email', $request->all()['email'])
             ->orWhere('phone', $request->all()['phone'])
             ->first();
 
-        if(isset($validate) == true){
+        if (isset($validate) == true) {
             return response()->json(array(
                 'data' => 'Ya existe un usuario con el mismo telefono, email o identificación',
                 'res' => false
@@ -122,8 +130,8 @@ class UsersController extends Controller
         $password = substr(str_shuffle($permitted_chars), 8, 8);
 
         $UrlImg = "";
-        if(isset($request->all()['photo'])){
-            $UrlImg = PhotoHelper::uploadBase64($request->all()['photo'], 'user_'.$request->all()['identify'], 'users');
+        if (isset($request->all()['photo'])) {
+            $UrlImg = PhotoHelper::uploadBase64($request->all()['photo'], 'user_' . $request->all()['identify'], 'users');
         }
 
         $user = User::create([
@@ -144,13 +152,13 @@ class UsersController extends Controller
             'state_id' => 1,
         ]);
 
-        if($UrlImg != ""){
+        if ($UrlImg != "") {
             User::where('unique_id', $user->unique_id)->update([
                 'photo' => $UrlImg,
             ]);
         }
 
-        for ($i=0; $i < count($request->all()['roles']); $i++) {
+        for ($i = 0; $i < count($request->all()['roles']); $i++) {
             RolesUsers::create([
                 'rol_id' => $request->all()['roles'][$i]['id'],
                 'user_id' => $user->id
@@ -158,7 +166,7 @@ class UsersController extends Controller
         }
 
         $dataEmail = [
-            'name' => $request->all()['name'].' '.$request->all()['lastName'],
+            'name' => $request->all()['name'] . ' ' . $request->all()['lastName'],
             'code' => $codeVerify,
             'pass' => $password
         ];
@@ -167,7 +175,7 @@ class UsersController extends Controller
         EmailHelper::sendMail('mails.users.Verify', $dataEmail, $request->all()['email'], "Codigo de verificación - Gestion Desempeño");
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => [
                 'unique_id' => $user->unique_id,
                 'msg' => 'Usuario Creado Correctamente'
@@ -175,8 +183,9 @@ class UsersController extends Controller
         ), 200);
     }
 
-    //OBTIENE TODOS LOS USUARIOS REGISTRADOS
-    public function findAll (Request $request){
+    //FUNCION PARA BUSCAR O TRAER TODOS LOS USUARIOS REGISTRADOS
+    public function findAll(Request $request)
+    {
         $paginate = $request->all()['paginate'];
         $page = $request->all()['page'];
         $column = $request->all()['column'];
@@ -186,59 +195,59 @@ class UsersController extends Controller
 
 
         $users = User::join('states', 'states.id', '=', 'users.state_id')
-        ->join('employments', 'employments.id', '=', 'users.employment_id')
-        ->leftjoin('companies', 'companies.id', '=', 'users.company_id');
-        if(count($search) > 0){
-            if(isset($search['name'])){
-                $users = $users->where('users.name', 'like', '%'.$search['name'].'%')
-                ->orWhere('users.lastName', 'like', '%'.$search['name'].'%');
+            ->join('employments', 'employments.id', '=', 'users.employment_id')
+            ->leftjoin('companies', 'companies.id', '=', 'users.company_id');
+        if (count($search) > 0) {
+            if (isset($search['name'])) {
+                $users = $users->where('users.name', 'like', '%' . $search['name'] . '%')
+                    ->orWhere('users.lastName', 'like', '%' . $search['name'] . '%');
             }
-            if(isset($search['identify'])){
+            if (isset($search['identify'])) {
                 $users = $users->where('users.identify', $search['identify']);
             }
-            if(isset($search['employment_id'])){
-                $users = $users->where('users.employment_id',$search['employment_id']);
+            if (isset($search['employment_id'])) {
+                $users = $users->where('users.employment_id', $search['employment_id']);
             }
-            if(isset($search['state_id'])  && $search['state_id'] != 0){
+            if (isset($search['state_id'])  && $search['state_id'] != 0) {
                 $users = $users->where('users.state_id', $search['state_id']);
             }
-            if(isset($search['companie_id'])){
+            if (isset($search['companie_id'])) {
                 $users = $users->where('companies.id', $search['companie_id']);
             }
         }
         $users = $users->limit($paginate)
-        ->offset(($page-1)*$paginate)
-        ->orderBy($column, $direction)
-        ->get([
-            'users.unique_id', 'users.name', 'users.lastName', 'users.identify', 'users.phone',
-            'users.email', 'users.address', 'users.city', 'users.verify', 'users.dateBirth',
-            'users.created_at', 'states.description as state', 'employments.description as employment',
-            'companies.businessName as company'
-        ]);
+            ->offset(($page - 1) * $paginate)
+            ->orderBy($column, $direction)
+            ->get([
+                'users.unique_id', 'users.name', 'users.lastName', 'users.identify', 'users.phone',
+                'users.email', 'users.address', 'users.city', 'users.verify', 'users.dateBirth',
+                'users.created_at', 'states.description as state', 'employments.description as employment',
+                'companies.businessName as company'
+            ]);
 
         $count = User::join('states', 'states.id', '=', 'users.state_id');
-        if(count($search) > 0){
-            if(isset($search['name'])){
-                $count = $count->where('name', 'like', '%'.$search['name'].'%')
-                ->orWhere('lastName', 'like', '%'.$search['name'].'%');
+        if (count($search) > 0) {
+            if (isset($search['name'])) {
+                $count = $count->where('name', 'like', '%' . $search['name'] . '%')
+                    ->orWhere('lastName', 'like', '%' . $search['name'] . '%');
             }
-            if(isset($search['identify'])){
+            if (isset($search['identify'])) {
                 $count = $count->where('identify', $search['identify']);
             }
-            if(isset($search['employment_id'])){
-                $count = $count->where('employment_id',$search['employment_id']);
+            if (isset($search['employment_id'])) {
+                $count = $count->where('employment_id', $search['employment_id']);
             }
-            if(isset($search['state_id']) && $search['state_id'] != 0){
+            if (isset($search['state_id']) && $search['state_id'] != 0) {
                 $count = $count->where('users.state_id', $search['state_id']);
             }
         }
         $count = $count
-        ->get([
-            'users.unique_id'
-        ]);
+            ->get([
+                'users.unique_id'
+            ]);
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => [
                 'users' => $users,
                 'total' => count($count)
@@ -246,49 +255,50 @@ class UsersController extends Controller
         ), 200);
     }
 
-    //OBTIENE UN USUARIO MEDIANTE EL UNIQUE_ID
-    public function findOne (Request $request, $uuid){
+    //FUNCION PARA BUSCAR UN USUARIO MEDIANTE EL UNIQUE_ID
+    public function findOne(Request $request, $uuid)
+    {
         $user = User::where('users.unique_id', $uuid)
-        ->join('states', 'states.id', '=', 'users.state_id')
-        ->join('employments', 'employments.id', '=', 'users.employment_id')
-        ->leftjoin('companies', 'companies.id', '=', 'users.company_id')
-        ->first([
-            'users.id', 'users.unique_id', 'users.name', 'users.lastName', 'users.identify', 'users.phone',
-            'users.email', 'users.address', 'users.city', 'users.verify', 'users.dateBirth',
-            'users.created_at', 'states.description as state', 'employments.description as employment',
-            'users.company_id', 'users.employment_id', 'users.photo'
-        ]);
+            ->join('states', 'states.id', '=', 'users.state_id')
+            ->join('employments', 'employments.id', '=', 'users.employment_id')
+            ->leftjoin('companies', 'companies.id', '=', 'users.company_id')
+            ->first([
+                'users.id', 'users.unique_id', 'users.name', 'users.lastName', 'users.identify', 'users.phone',
+                'users.email', 'users.address', 'users.city', 'users.verify', 'users.dateBirth',
+                'users.created_at', 'states.description as state', 'employments.description as employment',
+                'users.company_id', 'users.employment_id', 'users.photo'
+            ]);
 
         $user->company = Company::where('id', $user->company_id)->first();
         $user->roles = RolesUsers::where('user_id', $user->id)->join('roles', 'roles.id', '=', 'roles_users.rol_id')->get(['roles.id', 'description']);
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => $user
         ), 200);
     }
 
-    //ACTUALIZA UN USUARIO
-    public function update (Request $request, $uuid){
-        $validate = User::
-            where('identify', $request->all()['identify'])
+    //FUNCION PARA ACTUALIZAR UN USUARIO
+    public function update(Request $request, $uuid)
+    {
+        $validate = User::where('identify', $request->all()['identify'])
             ->orWhere('email', $request->all()['email'])
             ->orWhere('phone', $request->all()['phone'])
             ->first();
 
-        if(isset($validate) == true && $validate->unique_id != $uuid){
+        if (isset($validate) == true && $validate->unique_id != $uuid) {
             return response()->json(array(
                 'data' => 'Ya existe un usuario con el mismo telefono, email o identificación',
                 'res' => false
             ), 200);
         }
 
-        $user = User::where('unique_id', $uuid)->first(['id', 'unique_id','email']);
+        $user = User::where('unique_id', $uuid)->first(['id', 'unique_id', 'email']);
         $codeVerify = random_int(100000, 999999);
 
         $UrlImg = "";
-        if(isset($request->all()['photo'])){
-            $UrlImg = PhotoHelper::uploadBase64($request->all()['photo'], 'user_'.$request->all()['identify'], 'users');
+        if (isset($request->all()['photo'])) {
+            $UrlImg = PhotoHelper::uploadBase64($request->all()['photo'], 'user_' . $request->all()['identify'], 'users');
         }
 
         User::where('unique_id', $uuid)->update([
@@ -303,13 +313,13 @@ class UsersController extends Controller
             'company_id' => $request->all()['company_id'],
         ]);
 
-        if($UrlImg != ""){
+        if ($UrlImg != "") {
             User::where('unique_id', $user->unique_id)->update([
                 'photo' => $UrlImg,
             ]);
         }
 
-        if($request->all()['email'] != $user->email){
+        if ($request->all()['email'] != $user->email) {
             User::where('unique_id', $uuid)->update([
                 'email' => $request->all()['email'],
                 'verify' => 0,
@@ -317,52 +327,51 @@ class UsersController extends Controller
             ]);
 
             $dataEmail = [
-                'name' => $request->all()['name'].' '.$request->all()['lastName'],
+                'name' => $request->all()['name'] . ' ' . $request->all()['lastName'],
                 'code' => $codeVerify,
             ];
 
             EmailHelper::sendMail('mails.users.Verify', $dataEmail, $request->all()['email'], "Codigo de verificación - Gestion Desempeño");
         }
 
-        if(count($request->all()['roles']) > 0){
-            for ($i=0; $i < count($request->all()['roles']); $i++) {
-                if(!$request->all()['roles'][$i]['sync']){
+        if (count($request->all()['roles']) > 0) {
+            for ($i = 0; $i < count($request->all()['roles']); $i++) {
+                if (!$request->all()['roles'][$i]['sync']) {
                     RolesUsers::create([
                         'rol_id' => $request->all()['roles'][$i]['id'],
                         'user_id' => $user->id
                     ]);
                 }
-                if($request->all()['roles'][$i]['delete']){
-                    RolesUsers::
-                    where('rol_id', $request->all()['roles'][$i]['id'])
-                    ->where('user_id', $user->id)
-                    ->delete();
+                if ($request->all()['roles'][$i]['delete']) {
+                    RolesUsers::where('rol_id', $request->all()['roles'][$i]['id'])
+                        ->where('user_id', $user->id)
+                        ->delete();
                 }
             }
         }
 
-        if(isset($request->all()['password'])){
+        if (isset($request->all()['password'])) {
             User::where('unique_id', $uuid)->update([
                 'password' => bcrypt($request->all()['password']),
             ]);
         }
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => 'Usuario Actualizado Correctamente'
         ), 200);
     }
 
-    //ELIMINAR UN USUARIO
-    public function delete (Request $request, $uuid){
+    //FUNCION PARA ELIMINAR UN USUARIO
+    public function delete(Request $request, $uuid)
+    {
         User::where('unique_id', $uuid)->update([
             'state_id' => 2,
         ]);
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => 'Información Eliminada Correctamente'
         ), 200);
     }
-
 }

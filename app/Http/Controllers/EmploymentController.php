@@ -1,17 +1,23 @@
 <?php
 
+// ESTE ES EL CONTROLADOR DE CARGOS DONDE ESTAN LAS FUNCIONES DE TIPO CRUD
+
 namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Models\Employment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+
 class EmploymentController extends Controller
 {
-    public function Create (Request $request){
+
+    // FUNCION PARA CREAR O REGISTRAR UN CARGO
+    public function Create(Request $request)
+    {
         $validate = Employment::where('description', $request->all()['description'])->first();
 
-        if(isset($validate) == true){
+        if (isset($validate) == true) {
             return response()->json(array(
                 'data' => 'Ya existe un cargo con la misma descripción',
                 'res' => false
@@ -25,7 +31,7 @@ class EmploymentController extends Controller
         ]);
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => [
                 'roles' => $employment->unique_id,
                 'msg' => 'Cargo Creado Correctamente'
@@ -33,7 +39,9 @@ class EmploymentController extends Controller
         ), 200);
     }
 
-    public function FindAll (Request $request){
+    // FUNCION PARA TRAER O BUSCAR TODOS LOS CARGOS
+    public function FindAll(Request $request)
+    {
         $paginate = $request->all()['paginate'];
         $page = $request->all()['page'];
         $column = $request->all()['column'];
@@ -41,20 +49,20 @@ class EmploymentController extends Controller
         $search = $request->all()['search'];
 
         $employment = Employment::orderBy('description', 'asc')
-        ->leftjoin('companies', 'companies.id', '=', 'employments.company_id')
-        ->limit($paginate)
-        ->offset(($page-1)*$paginate)
-        ->orderBy($column, $direction)
-        ->get([
-            'employments.id', 'employments.unique_id', 'employments.description', 'employments.company_id', 'companies.businessName as company_name'
-        ]);
+            ->leftjoin('companies', 'companies.id', '=', 'employments.company_id')
+            ->limit($paginate)
+            ->offset(($page - 1) * $paginate)
+            ->orderBy($column, $direction)
+            ->get([
+                'employments.id', 'employments.unique_id', 'employments.description', 'employments.company_id', 'companies.businessName as company_name'
+            ]);
 
         $counts = Employment::leftjoin('companies', 'companies.id', '=', 'employments.company_id')->get(['employments.id']);
 
 
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => [
                 'employments' => $employment,
                 'total' => count($counts)
@@ -62,37 +70,43 @@ class EmploymentController extends Controller
         ), 200);
     }
 
-    public function FindAllPublic (Request $request){
+    // FUNCION PARA BUSCAR LOS CARGOS PUBLICAMENTE
+    public function FindAllPublic(Request $request)
+    {
         $employment = Employment::orderBy('description', 'asc')
-        ->where('company_id', null)
-        ->get([
-            'employments.id', 'employments.description'
-        ]);
+            ->where('company_id', null)
+            ->get([
+                'employments.id', 'employments.description'
+            ]);
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => $employment,
         ), 200);
     }
 
-    public function FindOne (Request $request, $uuid){
+    // FUNCION PARA ENCONTRAR UN SOLO CARGO POR SU UNIQUE_ID
+    public function FindOne(Request $request, $uuid)
+    {
         $employment = Employment::where('unique_id', $uuid)->first();
 
         $employment->company = null;
-        if($employment->company_id){
+        if ($employment->company_id) {
             $employment->company = Company::where('id', $employment->company_id)->first();
         }
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => $employment,
         ), 200);
     }
 
-    public function Update (Request $request, $uuid){
+    // FUNCION PARA ACTUALIZAR UN CARGO
+    public function Update(Request $request, $uuid)
+    {
         $validate = Employment::where('description', $request->all()['description'])->first();
 
-        if(isset($validate) == true && $validate->unique_id != $uuid){
+        if (isset($validate) == true && $validate->unique_id != $uuid) {
             return response()->json(array(
                 'data' => 'Ya existe un cargo con la misma descripción',
                 'res' => false
@@ -105,18 +119,20 @@ class EmploymentController extends Controller
         ]);
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => 'Cargo Actualizado Correctamente'
         ), 200);
     }
 
-    public function Delete (Request $request, $uuid){
+    // FUNCION PARA BORRAR UN CARGO
+    public function Delete(Request $request, $uuid)
+    {
         Employment::where('unique_id', $uuid)->update([
             'state_id' => 2,
         ]);
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => 'Información Eliminada Correctamente'
         ), 200);
     }
