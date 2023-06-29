@@ -1,16 +1,21 @@
 <?php
 
+// ESTE ES EL CONTROLADOR DE AREAS DONDE ESTAN LAS FUNCIONES DE TIPO CRUD
+
 namespace App\Http\Controllers;
 
 use App\Models\Area;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+
 class AreaController extends Controller
 {
-    public function Create (Request $request){
+    // FUNCION PARA CREAR AREA
+    public function Create(Request $request)
+    {
         $validate = Area::where('description', $request->all()['description'])->first();
 
-        if(isset($validate) == true){
+        if (isset($validate) == true) {
             return response()->json(array(
                 'data' => 'Ya existe un area con la misma descripción',
                 'res' => false
@@ -24,7 +29,7 @@ class AreaController extends Controller
         ]);
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => [
                 'roles' => $area->unique_id,
                 'msg' => 'Área Creada Correctamente'
@@ -32,7 +37,9 @@ class AreaController extends Controller
         ), 200);
     }
 
-    public function FindAll (Request $request){
+    // FUNCION PARA TRAER O BUSCAR TODAS LAS AREAS
+    public function FindAll(Request $request)
+    {
         $paginate = $request->all()['paginate'];
         $page = $request->all()['page'];
         $column = $request->all()['column'];
@@ -41,35 +48,35 @@ class AreaController extends Controller
 
 
         $companies = Area::leftjoin('companies', 'companies.id', '=', 'areas.company_id');
-        if(count($search) > 0){
-            if(isset($search['description'])){
-                $companies = $companies->where('areas.description', 'like', '%'.$search['description'].'%');
+        if (count($search) > 0) {
+            if (isset($search['description'])) {
+                $companies = $companies->where('areas.description', 'like', '%' . $search['description'] . '%');
             }
-            if(isset($search['company_id'])){
+            if (isset($search['company_id'])) {
                 $companies = $companies->where('areas.company_id', $search['company_id']);
             }
         }
         $companies = $companies->limit($paginate)
-        ->offset(($page-1)*$paginate)
-        ->orderBy($column, $direction)
-        ->get([
-            'areas.unique_id',  'areas.description', 'companies.businessName as company'
-        ]);
+            ->offset(($page - 1) * $paginate)
+            ->orderBy($column, $direction)
+            ->get([
+                'areas.unique_id',  'areas.description', 'companies.businessName as company'
+            ]);
 
 
         $counts = Area::leftjoin('companies', 'companies.id', '=', 'areas.company_id');
-        if(count($search) > 0){
-            if(isset($search['description'])){
-                $counts = $counts->where('areas.description', 'like', '%'.$search['description'].'%');
+        if (count($search) > 0) {
+            if (isset($search['description'])) {
+                $counts = $counts->where('areas.description', 'like', '%' . $search['description'] . '%');
             }
-            if(isset($search['company_id'])){
+            if (isset($search['company_id'])) {
                 $counts = $counts->where('areas.company_id', $search['company_id']);
             }
         }
         $counts = $counts->get(['areas.unique_id']);
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => [
                 'areas' => $companies,
                 'total' => count($counts)
@@ -77,37 +84,42 @@ class AreaController extends Controller
         ), 200);
     }
 
-    public function FindOne (Request $request, $uuid){
+    // FUNCION PARA TRAER O BUSCAR UNA SOLA AREA POR EL UNIQUE_ID
+    public function FindOne(Request $request, $uuid)
+    {
         $companies = Area::where('unique_id', $uuid)->first();
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => $companies
         ), 200);
     }
 
-    public function Update (Request $request, $uuid){
+    // FUNCION PARA ACTUALIZAR UNA AREA
+    public function Update(Request $request, $uuid)
+    {
         $area = Area::where('unique_id', $uuid)
-        ->update([
-            'description' => $request->all()['description'],
-            'company_id' => $request->all()['company_id'],
-        ]);
+            ->update([
+                'description' => $request->all()['description'],
+                'company_id' => $request->all()['company_id'],
+            ]);
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => 'Area Actualizado Correctamente'
         ), 200);
     }
 
-    public function Delete (Request $request, $uuid){
+    // FUNCION PARA BORRAR UN AREA
+    public function Delete(Request $request, $uuid)
+    {
         Area::where('unique_id', $uuid)->update([
             'state_id' => 2,
         ]);
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => 'Información Eliminada Correctamente'
         ), 200);
     }
-
 }

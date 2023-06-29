@@ -1,5 +1,6 @@
 <?php
 
+// MIGRACION PARA AGREGAR DATOS A VARIAS TABLAS YA CREADAS
 use App\Models\Employment;
 use App\Models\Roles;
 use App\Models\RolesUsers;
@@ -89,7 +90,6 @@ return new class extends Migration
             'rol_id' => 3,
             'user_id' => 1
         ]);
-
     }
 
     /**

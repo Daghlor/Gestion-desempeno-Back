@@ -1,5 +1,6 @@
 <?php
 
+// MIGRACION PARA AGREGAR COLUMNAS A LA TABLA CARGOS YA CREADA
 use App\Models\Employment;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -20,7 +21,6 @@ return new class extends Migration
             $table->unsignedBigInteger('company_id')->nullable()->after('description');
             $table->foreign('company_id')->references('id')->on('companies');
         });
-
     }
 
     /**

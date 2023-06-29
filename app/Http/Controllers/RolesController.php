@@ -1,17 +1,22 @@
 <?php
 
+// ESTE ES EL CONTROLADOR DE ROLES DONDE ESTAN LAS FUNCIONES DE TIPO CRUD
+
 namespace App\Http\Controllers;
 
 use App\Models\Roles;
 use App\Models\RolesPermissions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+
 class RolesController extends Controller
 {
-    public function Create (Request $request){
+    // FUNCION PARA CREAR O REGISTRAR LOS ROLES
+    public function Create(Request $request)
+    {
         $validate = Roles::where('description', $request->all()['description'])->first();
 
-        if(isset($validate) == true){
+        if (isset($validate) == true) {
             return response()->json(array(
                 'data' => 'Ya existe un rol con la misma descripción',
                 'res' => false
@@ -23,7 +28,7 @@ class RolesController extends Controller
             'description' => $request->all()['description']
         ]);
 
-        for ($i=0; $i < count($request->all()['permissions']); $i++) { 
+        for ($i = 0; $i < count($request->all()['permissions']); $i++) {
             RolesPermissions::create([
                 'rol_id' => $rol->id,
                 'permissions_id' => $request->all()['permissions'][$i]
@@ -31,7 +36,7 @@ class RolesController extends Controller
         }
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => [
                 'roles' => $rol->unique_id,
                 'msg' => 'Información Creada Correctamente'
@@ -39,32 +44,38 @@ class RolesController extends Controller
         ), 200);
     }
 
-    public function FindAll (Request $request){
+    // FUNCION PARA TRAER O BUSCAR TODOS LOS ROLES
+    public function FindAll(Request $request)
+    {
         $roles = Roles::orderBy('description', 'asc')->get();
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => $roles,
         ), 200);
     }
 
-    public function FindOne (Request $request, $uuid){
+    // FUNCIOM PARA BUSCAR UN SOLO ROL POR SU UNIQUE_ID
+    public function FindOne(Request $request, $uuid)
+    {
         $roles = Roles::where('unique_id', $uuid)->first();
 
         $roles->permissions = RolesPermissions::where('rol_id', $roles->id)
-        ->join('permissions', 'permissions.id', '=', 'roles_permissions.permissions_id')
-        ->get(['permissions.unique_id', 'permissions.description', 'permissions.code']);
+            ->join('permissions', 'permissions.id', '=', 'roles_permissions.permissions_id')
+            ->get(['permissions.unique_id', 'permissions.description', 'permissions.code']);
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => $roles,
         ), 200);
     }
 
-    public function Update (Request $request, $uuid){
+    // FUNCION PARA ACTUALIAZAR UN ROL
+    public function Update(Request $request, $uuid)
+    {
         $validate = Roles::where('description', $request->all()['description'])->first();
 
-        if(isset($validate) == true && $validate->unique_id != $uuid){
+        if (isset($validate) == true && $validate->unique_id != $uuid) {
             return response()->json(array(
                 'data' => 'Ya existe un rol con la misma descripción',
                 'res' => false
@@ -76,8 +87,8 @@ class RolesController extends Controller
             'description' => $request->all()['description'],
         ]);
 
-        RolesPermissions::where('rol_id', $rol->id)->delete(); 
-        for ($i=0; $i < count($request->all()['permissions']); $i++) {
+        RolesPermissions::where('rol_id', $rol->id)->delete();
+        for ($i = 0; $i < count($request->all()['permissions']); $i++) {
             RolesPermissions::create([
                 'rol_id' => $rol->id,
                 'permissions_id' => $request->all()['permissions'][$i]
@@ -85,10 +96,8 @@ class RolesController extends Controller
         }
 
         return response()->json(array(
-            'res'=> true,
+            'res' => true,
             'data' => 'Rol Actualizado Correctamente'
         ), 200);
     }
-
-
 }

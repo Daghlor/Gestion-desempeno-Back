@@ -1,5 +1,6 @@
 <?php
 
+// MIGRACION PARA CREAR LA TABLA AREAS CON SUS COLUMNAS Y CON SU LLAVE FORANEA A OTRA TABLA
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

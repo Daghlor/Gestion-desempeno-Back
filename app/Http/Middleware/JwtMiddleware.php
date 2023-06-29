@@ -25,21 +25,21 @@ class JwtMiddleware extends BaseMiddleware
 
             $user = FacadesJWTAuth::parseToken()->authenticate();
         } catch (Exception $e) {
-            if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException){
+            if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
                 return response()->json(array(
-                    'msg'=> 'Usuario no logueado',
+                    'msg' => 'Usuario no logueado',
                     'code' => 'login_failed',
                     'redirect' => '/login',
                 ), 200);
-            }else if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException){
+            } else if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
                 return response()->json(array(
-                    'msg'=> 'Sesion Expiro',
+                    'msg' => 'Sesion Expiro',
                     'code' => 'login_failed',
                     'redirect' => '/login',
                 ), 200);
-            }else{
+            } else {
                 return response()->json(array(
-                    'msg'=> 'Autorización no existe',
+                    'msg' => 'No existe Autorización',
                     'code' => 'login_failed',
                     'redirect' => '/login',
                 ), 200);

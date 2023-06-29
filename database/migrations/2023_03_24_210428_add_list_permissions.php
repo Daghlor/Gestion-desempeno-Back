@@ -1,5 +1,6 @@
 <?php
 
+// MIGRACION PARA AGREGAR DATOS A LA TABLA PERMISOS YA CREADA
 use App\Models\Permissions;
 use App\Models\Roles;
 use App\Models\RolesPermissions;
@@ -193,16 +194,16 @@ return new class extends Migration
             'code' => 'list_permissions'
         ]);
 
-        for ($i=1; $i < 30; $i++) {
-            if($i != 18 || $i != 22){
+        for ($i = 1; $i < 30; $i++) {
+            if ($i != 18 || $i != 22) {
                 RolesPermissions::create([
                     'rol_id' => 3,
                     'permissions_id' => $i,
                 ]);
             }
         }
-        for ($i=5; $i < 26; $i++) {
-            if($i != 21 || $i != 22 || $i != 23){
+        for ($i = 5; $i < 26; $i++) {
+            if ($i != 21 || $i != 22 || $i != 23) {
                 RolesPermissions::create([
                     'rol_id' => 1,
                     'permissions_id' => $i,
