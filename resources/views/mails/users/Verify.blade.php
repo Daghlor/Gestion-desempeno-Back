@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="x-apple-disable-message-reformatting">
-  <title></title>
-  <!--[if mso]>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="x-apple-disable-message-reformatting">
+    <title></title>
+    <!--[if mso]>
   <noscript>
     <xml>
       <o:OfficeDocumentSettings>
@@ -14,62 +15,90 @@
     </xml>
   </noscript>
   <![endif]-->
-  <style>
-    table, td, div, h1, p {font-family: Arial, sans-serif;}
-  </style>
+    <style>
+        table,
+        td,
+        div,
+        h1,
+        p {
+            font-family: Arial, sans-serif;
+        }
+    </style>
 </head>
+
 <body style="margin:0;padding:0;">
-  <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
-    <tr>
-      <td align="center" style="padding:0;">
-        <table role="presentation" style="width:602px;border-collapse:collapse;border:1px solid #cccccc;border-spacing:0;text-align:left;">
-          <tr>
-            <td align="center" style="padding:40px 0 30px 0;background:#70bbd9;">
-                <a href="https://ibb.co/tsbx0cg"><img src="https://i.ibb.co/Xsz3np1/Recurso-2.png" alt="Recurso-2" border="0"></a>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:36px 30px 42px 30px;">
-              <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
-                <tr>
-                  <td style="padding:0 0 36px 0;color:#153643;">
-                    <h1 style="font-size:24px;margin:0 0 20px 0;font-family:Arial,sans-serif;">Verificacion - GDD - Kometa</h1>
-                    <p style="margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;"> Hola {{$name}}, Ya estas registrado en nuestra pagina web gestion de desempeño y
-                      para mayor seguridad generamos este codigo de verificación de un solo uso para confirmar tu identidad.</p>
-                    <p style="font-family:Arial,sans-serif; text-align: center;"><a style="color:#ee4c50;text-decoration:underline; text-align: center; width: 15%; margin-left: auto; margin-right: auto;"> Codigo {{$code}}</a></p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:30px;background:#ee4c50;">
-              <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;font-size:9px;font-family:Arial,sans-serif;">
-                <tr>
-                  <td style="padding:0;width:50%;" align="left">
-                    <p style="margin:0;font-size:14px;line-height:16px;font-family:Arial,sans-serif;color:#ffffff;">
-                      &reg; Kometa<br/><a href="http://www.example.com" style="color:#ffffff;text-decoration:underline;"></a>
-                    </p>
-                  </td>
-                  <td style="padding:0;width:50%;" align="right">
-                    <table role="presentation" style="border-collapse:collapse;border:0;border-spacing:0;">
-                      <tr>
-                        <td style="padding:0 0 0 10px;width:38px;">
-                          <a href="http://www.twitter.com/" style="color:#ffffff;"><img src="https://assets.codepen.io/210284/tw_1.png" alt="Twitter" width="38" style="height:auto;display:block;border:0;" /></a>
+    <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;">
+        <tr>
+            <td align="center" style="padding:0;">
+                <table role="presentation"
+                    style="width:602px;border-collapse:collapse;border:1px solid #cccccc;border-spacing:0;text-align:left;">
+                    <tr>
+                        <td align="center" style="padding:40px 0 30px 0;background:#70bbd9;">
+                            <a href="https://ibb.co/tsbx0cg"><img src="https://i.ibb.co/Xsz3np1/Recurso-2.png"
+                                    alt="Recurso-2" border="0"></a>
                         </td>
-                        <td style="padding:0 0 0 10px;width:38px;">
-                          <a href="http://www.facebook.com/" style="color:#ffffff;"><img src="https://assets.codepen.io/210284/fb_1.png" alt="Facebook" width="38" style="height:auto;display:block;border:0;" /></a>
+                    </tr>
+                    <tr>
+                        <td style="padding:36px 30px 42px 30px;">
+                            <table role="presentation"
+                                style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                                <tr>
+                                    <td style="padding:0 0 36px 0;color:#153643;">
+                                        <h1 style="font-size:24px;margin:0 0 20px 0;font-family:Arial,sans-serif;">
+                                            Verificacion - GDD - Kometa</h1>
+                                        <p
+                                            style="margin:0 0 12px 0;font-size:16px;line-height:24px;font-family:Arial,sans-serif;">
+                                            Hola {{ $name }}, Ya estás registrado/a en nuestra página web
+                                            Gestión de desempeño y
+                                            para mayor seguridad generamos este código de verificación de un solo uso
+                                            para confirmar tu identidad.</p>
+                                        <p style="font-family:Arial,sans-serif; text-align: center;"><a
+                                                style="color:#ee4c50;text-decoration:underline; text-align: center; width: 15%; margin-left: auto; margin-right: auto;">
+                                                Código {{ $code }}</a></p>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
+                    </tr>
+                    <tr>
+                        <td style="padding:30px;background:#ee4c50;">
+                            <table role="presentation"
+                                style="width:100%;border-collapse:collapse;border:0;border-spacing:0;font-size:9px;font-family:Arial,sans-serif;">
+                                <tr>
+                                    <td style="padding:0;width:50%;" align="left">
+                                        <p
+                                            style="margin:0;font-size:14px;line-height:16px;font-family:Arial,sans-serif;color:#ffffff;">
+                                            &reg; Kometa<br /><a href="http://www.example.com"
+                                                style="color:#ffffff;text-decoration:underline;"></a>
+                                        </p>
+                                    </td>
+                                    <td style="padding:0;width:50%;" align="right">
+                                        <table role="presentation"
+                                            style="border-collapse:collapse;border:0;border-spacing:0;">
+                                            <tr>
+                                                <td style="padding:0 0 0 10px;width:38px;">
+                                                    <a href="http://www.twitter.com/" style="color:#ffffff;"><img
+                                                            src="https://assets.codepen.io/210284/tw_1.png"
+                                                            alt="Twitter" width="38"
+                                                            style="height:auto;display:block;border:0;" /></a>
+                                                </td>
+                                                <td style="padding:0 0 0 10px;width:38px;">
+                                                    <a href="http://www.facebook.com/" style="color:#ffffff;"><img
+                                                            src="https://assets.codepen.io/210284/fb_1.png"
+                                                            alt="Facebook" width="38"
+                                                            style="height:auto;display:block;border:0;" /></a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
             </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
+        </tr>
+    </table>
 </body>
+
 </html>
