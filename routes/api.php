@@ -10,6 +10,7 @@ use App\Http\Controllers\EmploymentController;
 use App\Http\Controllers\ObjectivesIndividualController;
 use App\Http\Controllers\ObjectivesStrategicsController;
 use App\Http\Controllers\PercentageController;
+use App\Http\Controllers\PerformancePlansController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\TracingController;
 use App\Http\Controllers\UsersController;
@@ -126,6 +127,15 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::post('getAll', [TracingController::class, 'FindAll']);
         Route::post('getAll/users', [TracingController::class, 'FindUserTracing']);
         Route::get('getOne/{uuid}', [TracingController::class, 'FindOne']);
+    });
+
+    Route::group([
+        'prefix' => 'plans'
+    ], function ($router) {
+        Route::post('create', [PerformancePlansController::class, 'Create']);
+        // Route::post('getAll', [TracingController::class, 'FindAll']);
+        // Route::post('getAll/users', [TracingController::class, 'FindUserTracing']);
+        // Route::get('getOne/{uuid}', [TracingController::class, 'FindOne']);
     });
 
     Route::group([
