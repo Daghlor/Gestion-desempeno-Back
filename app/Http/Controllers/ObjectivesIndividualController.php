@@ -119,17 +119,16 @@ class ObjectivesIndividualController extends Controller
 
     // FUNCION PARA BORRAR UN OBJETIVO INDIVIDUAL
     public function Delete(Request $request, $uuid)
-    {
-        ObjectivesIndividual::where('unique_id', $uuid)
-            ->update([
-                'state_id' => 2,
-            ]);
+{
+    ObjectivesIndividual::where('unique_id', $uuid)->delete();
 
-        return response()->json(array(
-            'res' => true,
-            'data' => 'Objetivo Individual Eliminando Correctamente'
-        ), 200);
-    }
+    return response()->json(array(
+        'res' => true,
+        'data' => 'Objetivo Individual Eliminado Correctamente'
+    ), 200);
+}
+
+
 
     public function FindTargeted(Request $request, $strategicUniqueId)
     {
