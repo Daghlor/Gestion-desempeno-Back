@@ -24,6 +24,7 @@ class ObjectivesIndividualController extends Controller
             'user_id' => auth()->user()->id,
             'state_id' => 1,
             'strategic_id' => $request->all()['strategic_id'],
+            'plans_id' => $request->all()['plans_id'],
         ]);
 
         return response()->json(array(

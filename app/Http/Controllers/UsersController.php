@@ -320,6 +320,12 @@ class UsersController extends Controller
             ]);
         }
 
+        if (!empty($request->all()['password'])) {
+            User::where('unique_id', $user->unique_id)->update([
+                'password' => bcrypt($request->all()['password']),
+            ]);
+        }
+
         if ($request->all()['email'] != $user->email) {
             User::where('unique_id', $uuid)->update([
                 'email' => $request->all()['email'],

@@ -133,7 +133,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         'prefix' => 'plans'
     ], function ($router) {
         Route::post('create', [PerformancePlansController::class, 'Create']);
-        // Route::post('getAll', [TracingController::class, 'FindAll']);
+        Route::post('getAll', [PerformancePlansController::class, 'FindAll']);
         // Route::post('getAll/users', [TracingController::class, 'FindUserTracing']);
         // Route::get('getOne/{uuid}', [TracingController::class, 'FindOne']);
     });

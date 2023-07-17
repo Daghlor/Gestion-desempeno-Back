@@ -21,6 +21,7 @@ class TracingController extends Controller
             'comment' => $request->all()['comment'],
             'user_id' => auth()->user()->id,
             'individual_id' => $request->all()['individual_id'],
+            'plans_id' => $request->all()['plans_id'],
         ]);
 
         return response()->json(array(
@@ -122,7 +123,7 @@ class TracingController extends Controller
                 'objectives_individuals.id', 'objectives_individuals.unique_id', 'objectives_individuals.title',
                 'objectives_individuals.objetive', 'objectives_strategics.title as title_strategics',
                 'objectives_individuals.weight', 'objectives_individuals.strategic_id', 'objectives_individuals.state_id',
-                'objectives_individuals.created_at', 'states_objectives.description as state'
+                'objectives_individuals.created_at', 'states_objectives.description as state', 'objectives_individuals.plans_id',
             ]);
 
         for ($i = 0; $i < count($objetives); $i++) {

@@ -30,61 +30,42 @@ class PerformancePlansController extends Controller
     }
 
     public function FindAll (Request $request){
-        // $paginate = $request->all()['paginate'];
-        // $page = $request->all()['page'];
-        // $column = $request->all()['column'];
-        // $direction = $request->all()['direction'];
-        // $search = $request->all()['search'];
+        $paginate = $request->all()['paginate'];
+        $page = $request->all()['page'];
+        $column = $request->all()['column'];
+        $direction = $request->all()['direction'];
+        $search = $request->all()['search'];
 
-        // $objetives = PerformancePlans::join('companies', 'companies.id', '=', 'objectives_strategics.company_id')
-        // ->join('areas', 'areas.id', '=', 'objectives_strategics.areas_id')
-        // ->join('users', 'users.id', '=', 'objectives_strategics.user_id')
-        // ->join('states', 'states.id', '=', 'objectives_strategics.state_id');
+        $plan = PerformancePlans::join('companies', 'companies.id', '=', 'performance_plans.company_id');
+        if(count($search) > 0){
+            if(isset($search['company_id'])){
+                $plan = $plan->where('performance_plans.company_id', $search['company_id']);
+            }
+        }
+        $plan = $plan->limit($paginate)
+        ->offset(($page-1)*$paginate)
+        ->orderBy($column, $direction)
+        ->get([
+            'performance_plans.unique_id',  'performance_plans.name', 'performance_plans.term', 'performance_plans.dateInit',
+            'performance_plans.dateEnd', 'performance_plans.state', 'performance_plans.company_id', 'companies.businessName as company'
+        ]);
 
-        // if(count($search) > 0){
-        //     if(isset($search['user_id'])){
-        //         $objetives = $objetives->where('objectives_strategics.user_id', $search['user_id']);
-        //     }
-        //     if(isset($search['areas_id'])){
-        //         $objetives = $objetives->where('objectives_strategics.areas_id', $search['areas_id']);
-        //     }
-        //     if(isset($search['company_id'])){
-        //         $objetives = $objetives->where('objectives_strategics.company_id', $search['company_id']);
-        //     }
-        //     if(isset($search['state_id'])){
-        //         $objetives = $objetives->where('objectives_strategics.state_id', $search['state_id']);
-        //     }
-        // }
-        // $objetives = $objetives->limit($paginate)
-        // ->offset(($page-1)*$paginate)
-        // ->orderBy($column, $direction)
-        // ->get([
-        //     'objectives_strategics.unique_id',  'objectives_strategics.title', 'objectives_strategics.mission', 'objectives_strategics.vision',
-        //     'objectives_strategics.totalWeight', 'companies.businessName as company', DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"),
-        //     'users.identify', 'areas.description as area', 'states.description as state'
-        // ]);
 
-        // $counts = PerformancePlans::join('states', 'states.id', '=', 'objectives_strategics.state_id');
-        // if(count($search) > 0){
-        //     if(isset($search['user_id'])){
-        //         $counts = $counts->where('objectives_strategics.user_id', $search['user_id']);
-        //     }
-        //     if(isset($search['areas_id'])){
-        //         $counts = $counts->where('objectives_strategics.areas_id', $search['areas_id']);
-        //     }
-        //     if(isset($search['company_id'])){
-        //         $counts = $counts->where('objectives_strategics.company_id', $search['company_id']);
-        //     }
-        // }
-        // $counts = $counts->get(['objectives_strategics.unique_id']);
+        $counts = PerformancePlans::join('companies', 'companies.id', '=', 'performance_plans.company_id');
+        if(count($search) > 0){
+            if(isset($search['company_id'])){
+                $plan = $plan->where('performance_plans.company_id', $search['company_id']);
+            }
+        }
+        $counts = $counts->get(['performance_plans.unique_id']);
 
-        // return response()->json(array(
-        //     'res'=> true,
-        //     'data' => [
-        //         'objetives' => $objetives,
-        //         'total' => count($counts)
-        //     ]
-        // ), 200);
+        return response()->json(array(
+            'res'=> true,
+            'data' => [
+                'plans' => $plan,
+                'total' => count($counts)
+            ]
+        ), 200);
     }
 
     public function FindOne (Request $request, $uuid){
