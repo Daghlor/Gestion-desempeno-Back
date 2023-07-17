@@ -61,6 +61,9 @@ class ObjectivesIndividualController extends Controller
             if (isset($search['strategic_id'])) {
                 $objetives = $objetives->where('objectives_individuals.strategic_id', $search['strategic_id']);
             }
+            if (isset($search['nameUser'])) {
+                $objetives = $objetives->where('users.name', 'like', '%' . $search['nameUser'] . '%');
+            }
         }
         $objetives = $objetives->limit($paginate)
             ->offset(($page - 1) * $paginate)
@@ -119,14 +122,14 @@ class ObjectivesIndividualController extends Controller
 
     // FUNCION PARA BORRAR UN OBJETIVO INDIVIDUAL
     public function Delete(Request $request, $uuid)
-{
-    ObjectivesIndividual::where('unique_id', $uuid)->delete();
+    {
+        ObjectivesIndividual::where('unique_id', $uuid)->delete();
 
-    return response()->json(array(
-        'res' => true,
-        'data' => 'Objetivo Individual Eliminado Correctamente'
-    ), 200);
-}
+        return response()->json(array(
+            'res' => true,
+            'data' => 'Objetivo Individual Eliminado Correctamente'
+        ), 200);
+    }
 
 
 
