@@ -9,6 +9,7 @@ use App\Models\Company;
 use App\Models\Employment;
 use App\Models\ObjectivesIndividual;
 use App\Models\ObjectivesStrategics;
+use App\Models\PerformancePlans;
 use App\Models\Roles;
 use App\Models\RolesPermissions;
 use App\Models\RolesUsers;
@@ -144,15 +145,17 @@ class AuthController extends Controller
         if ($validateSuperAdmin > 0) {
             $employments = Employment::get(['id', 'description', 'company_id']);
             $areas = Area::get(['id', 'description', 'company_id']);
-            $strategics = ObjectivesStrategics::get(['id', 'title', 'company_id']);
+            $strategics = ObjectivesStrategics::get(['id', 'title', 'company_id', 'plans_id']);
             $companies = Company::where('state_id', 1)->get(['id', 'businessName']);
             $roles = Roles::get(['id', 'description']);
+            $plans = PerformancePlans::get(['id', 'name', 'company_id']);
         } else {
             if (auth()->user()->company_id) {
                 $employments = Employment::where('company_id', auth()->user()->company_id)->get(['id', 'description', 'company_id']);
                 $areas = Area::where('company_id', auth()->user()->company_id)->get(['id', 'description', 'company_id']);
-                $strategics = ObjectivesStrategics::where('company_id', auth()->user()->company_id)->get(['id', 'title', 'company_id']);
+                $strategics = ObjectivesStrategics::where('company_id', auth()->user()->company_id)->get(['id', 'title', 'company_id', 'plans_id']);
                 $companies = Company::where('id', auth()->user()->company_id)->get(['id', 'businessName']);
+                $plans = PerformancePlans::where('company_id', auth()->user()->company_id)->get(['id', 'name']);
             }
 
             if ($validateAdmin > 0) {
@@ -167,7 +170,8 @@ class AuthController extends Controller
             'employments' => $employments,
             'roles' => $roles,
             'areas' => $areas,
-            'strategics' => $strategics
+            'strategics' => $strategics,
+            'plans' => $plans,
         ), 200);
     }
 

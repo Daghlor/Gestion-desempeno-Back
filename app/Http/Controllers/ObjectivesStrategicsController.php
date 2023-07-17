@@ -27,6 +27,7 @@ class ObjectivesStrategicsController extends Controller
             'company_id' => $request->all()['company_id'],
             'user_id' => auth()->user()->id,
             'areas_id' => $request->all()['areas_id'],
+            'plans_id' => $request->all()['plans_id'],
             'state_id' => 1
         ]);
 
