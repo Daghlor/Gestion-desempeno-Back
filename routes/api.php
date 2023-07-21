@@ -7,12 +7,14 @@ use App\Http\Controllers\AreaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmploymentController;
+use App\Http\Controllers\FeedbackActionsController;
 use App\Http\Controllers\ObjectivesIndividualController;
 use App\Http\Controllers\ObjectivesStrategicsController;
 use App\Http\Controllers\PercentageController;
 use App\Http\Controllers\PerformancePlansController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\TracingController;
+use App\Http\Controllers\TrainingActionsController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route as RoutingRoute;
@@ -143,6 +145,24 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     ], function ($router) {
         Route::post('calculatePercentage/{uniqueId}', [PercentageController::class, 'calculatePercentage']);
     });
+
+    Route::group(
+        [
+            'prefix' => 'training'
+        ],
+        function ($router) {
+            Route::post('create', [TrainingActionsController::class, 'Create']);
+        }
+    );
+
+    Route::group(
+        [
+            'prefix' => 'feedback'
+        ],
+        function ($router) {
+            Route::post('create', [FeedbackActionsController::class, 'Create']);
+        }
+    );
 });
 
 
