@@ -152,6 +152,9 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         ],
         function ($router) {
             Route::post('create', [TrainingActionsController::class, 'Create']);
+            Route::put('update/{uuid}', [TrainingActionsController::class, 'Update']);
+            Route::post('getAll', [TrainingActionsController::class, 'FindAll']);
+            Route::delete('delete/{uuid}', [TrainingActionsController::class, 'Delete']);
         }
     );
 
@@ -161,6 +164,9 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         ],
         function ($router) {
             Route::post('create', [FeedbackActionsController::class, 'Create']);
+            Route::put('update/{uuid}', [FeedbackActionsController::class, 'Update']);
+            Route::post('getAll', [FeedbackActionsController::class, 'FindAll']);
+            Route::delete('delete/{uuid}', [FeedbackActionsController::class, 'Delete']);
         }
     );
 });
