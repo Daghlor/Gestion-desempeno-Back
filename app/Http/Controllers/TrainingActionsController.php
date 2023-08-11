@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\TrainingActions;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class TrainingActionsController extends Controller
 {
@@ -66,12 +67,37 @@ class TrainingActionsController extends Controller
 
     public function FindAll(Request $request)
     {
+        $paginate = $request->all()['paginate'];
+        $page = $request->all()['page'];
+        $column = $request->all()['column'];
+        $direction = $request->all()['direction'];
+        $search = $request->all()['search'];
 
-        $trainingActions = TrainingActions::all();
+        $training = TrainingActions::join('users', 'users.id', '=', 'training_actions.user_id');
+        if (count($search) > 0) {
+            if (isset($search['title'])) {
+                $training = $training->where('training_actions.title', 'like', '%' . $search['title'] . '%');
+            }
+            if (isset($search['user_id'])) {
+                $training = $training->where('training_actions.user_id', $search['user_id']);
+            }
+        }
+
+        $training = $training->limit($paginate)
+            ->offset(($page - 1) * $paginate)
+            ->orderBy($column, $direction)
+            ->get([
+                'training_actions.id', 'training_actions.unique_id', 'training_actions.title', DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"),
+            ]);
+
+        $total = TrainingActions::count();
 
         return response()->json([
             'res' => true,
-            'data' => $trainingActions
+            'data' => [
+                'titles' => $training,
+                'total' => $total,
+            ]
         ], 200);
     }
 

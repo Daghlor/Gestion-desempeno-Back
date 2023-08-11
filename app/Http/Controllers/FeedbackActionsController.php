@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\FeedbackActions;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class FeedbackActionsController extends Controller
 {
@@ -69,11 +71,37 @@ class FeedbackActionsController extends Controller
 
     public function FindAll(Request $request)
     {
-        $feedbackActions = FeedbackActions::all();
+        $paginate = $request->all()['paginate'];
+        $page = $request->all()['page'];
+        $column = $request->all()['column'];
+        $direction = $request->all()['direction'];
+        $search = $request->all()['search'];
+
+        $feeback = FeedbackActions::join('users', 'users.id', '=', 'feeback_actions.user_id');
+        if (count($search) > 0) {
+            if (isset($search['title'])) {
+                $feeback = $feeback->where('feeback_actions.title', 'like', '%' . $search['title'] . '%');
+            }
+            if (isset($search['user_id'])) {
+                $feeback = $feeback->where('feeback_actions.user_id', $search['user_id']);
+            }
+        }
+
+        $feeback = $feeback->limit($paginate)
+            ->offset(($page - 1) * $paginate)
+            ->orderBy($column, $direction)
+            ->get([
+                'feeback_actions.id', 'feeback_actions.unique_id', 'feeback_actions.title', DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"),
+            ]);
+
+        $total = FeedbackActions::count();
 
         return response()->json([
             'res' => true,
-            'data' => $feedbackActions
+            'data' => [
+                'titles' => $feeback,
+                'total' => $total,
+            ]
         ], 200);
     }
 
