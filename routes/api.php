@@ -143,7 +143,9 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     Route::group([
         'prefix' => 'percentage'
     ], function ($router) {
-        Route::post('calculatePercentage/{uniqueId}', [PercentageController::class, 'calculatePercentage']);
+        // Route::post('calculatePercentage', [PercentageController::class, 'calculatePercentage']);
+        Route::post('countIndividualsAlignedWithStrategics', [PercentageController::class, 'countIndividualsAlignedWithStrategics']);
+        Route::post('getTotal', [PercentageController::class, 'getTotal']);
     });
 
     Route::group(

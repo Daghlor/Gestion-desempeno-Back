@@ -133,30 +133,51 @@ class ObjectivesIndividualController extends Controller
     }
 
 
-
-    public function FindTargeted(Request $request, $strategicUniqueId)
+    public function FindAllTargeted(Request $request)
     {
-        // Obtener el objetivo estratégico correspondiente al unique_id
-        $strategicObjective = ObjectivesStrategics::where('unique_id', $strategicUniqueId)->first();
+        // Obtener una lista de los objetivos estratégicos que deseas incluir en la gráfica
+        $strategicUniqueIds = $request->input('strategic_unique_ids');
 
-        // Verificar si se encontró el objetivo estratégico
-        if (!$strategicObjective) {
+        // Verificar si se proporcionaron identificadores estratégicos
+        if (empty($strategicUniqueIds)) {
             return response()->json([
                 'res' => false,
-                'message' => 'No se encontró el objetivo estratégico correspondiente al unique_id.',
-            ], 404);
+                'message' => 'No se proporcionaron identificadores estratégicos.',
+            ], 400);
         }
 
-        // Obtener los objetivos individuales relacionados con el objetivo estratégico
-        $targetedObjectives = ObjectivesIndividual::where('strategic_id', $strategicObjective->id)->get();
-        $totalTargeted = $targetedObjectives->count();
+        // Inicializar arrays para almacenar los datos de cada objetivo estratégico
+        $chartData = [];
+        $chartLabels = [];
+
+        // Iterar sobre los identificadores estratégicos
+        foreach ($strategicUniqueIds as $uniqueId) {
+            // Obtener el objetivo estratégico correspondiente al unique_id
+            $strategicObjective = ObjectivesStrategics::where('unique_id', $uniqueId)->first();
+
+            // Verificar si se encontró el objetivo estratégico
+            if (!$strategicObjective) {
+                // Puedes manejar esto de acuerdo a tus requerimientos, por ejemplo, saltar este objetivo o reportar un error.
+                continue;
+            }
+
+            // Obtener los datos necesarios para el gráfico de este objetivo estratégico
+            $targetedObjectives = ObjectivesIndividual::where('strategic_id', $strategicObjective->id)->get();
+            $totalTargeted = $targetedObjectives->count();
+
+            // Agregar los datos al array de gráfico
+            $chartData[] = $totalTargeted;
+
+            // Agregar etiquetas (puedes usar el título del objetivo estratégico)
+            $chartLabels[] = $strategicObjective->title;
+        }
 
         return response()->json([
             'res' => true,
             'data' => [
-                'targeted_objectives' => $targetedObjectives,
-                'total_targeted' => $totalTargeted,
-            ]
+                'chartData' => $chartData,
+                'chartLabels' => $chartLabels,
+            ],
         ], 200);
     }
 }
