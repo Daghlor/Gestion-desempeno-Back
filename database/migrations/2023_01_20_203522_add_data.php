@@ -30,11 +30,19 @@ return new class extends Migration
 
         StatesObjectives::create([
             'id' => 1,
-            'description' => 'No Calificado',
+            'description' => 'Pendiente de aprobación',
         ]);
         StatesObjectives::create([
             'id' => 2,
+            'description' => 'Aprobado',
+        ]);
+        StatesObjectives::create([
+            'id' => 3,
             'description' => 'Calificado',
+        ]);
+        StatesObjectives::create([
+            'id' => 4,
+            'description' => 'Cerrado',
         ]);
 
         Employment::create([
