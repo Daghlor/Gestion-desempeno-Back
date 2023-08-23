@@ -36,6 +36,32 @@ class ObjectivesIndividualController extends Controller
         ), 200);
     }
 
+    public function UpdateState(Request $request, $uuid)
+    {
+        // Obtén el estado deseado desde la solicitud
+        $newStateId = $request->input('new_state_id');
+
+        // Busca el objetivo individual por su UUID
+        $objective = ObjectivesIndividual::where('unique_id', $uuid)->first();
+
+        // Verifica si se encontró el objetivo
+        if (!$objective) {
+            return response()->json([
+                'res' => false,
+                'message' => 'Objetivo individual no encontrado.',
+            ], 404);
+        }
+
+        // Actualiza el estado del objetivo individual
+        $objective->state_id = $newStateId;
+        $objective->save();
+
+        return response()->json([
+            'res' => true,
+            'message' => 'Estado del objetivo individual actualizado correctamente.',
+        ], 200);
+    }
+
     // FUNCION PARA TRAER O BUSCAR TODOS LOS OBJETIVOS INDIVIDUALES QUE SE HAYAN REGISTRADO
     public function FindAll(Request $request)
     {
@@ -120,6 +146,32 @@ class ObjectivesIndividualController extends Controller
             'data' => $objetives
         ), 200);
     }
+
+    public function FindAllByUserUniqueId(Request $request, $uuid)
+    {
+        // Buscar todos los objetivos individuales del usuario por su unique_id
+        $objetives = ObjectivesIndividual::where('user_id', function ($query) use ($uuid) {
+            $query->select('id')
+                ->from('users')
+                ->where('unique_id', $uuid);
+        })->get();
+
+        // Obtener los títulos de los objetivos estratégicos asociados a cada objetivo individual
+        foreach ($objetives as $objetivo) {
+            $strategic = ObjectivesStrategics::find($objetivo->strategic_id);
+            if ($strategic) {
+                $objetivo->title_strategics = $strategic->title;
+            } else {
+                $objetivo->title_strategics = null;
+            }
+        }
+
+        return response()->json(array(
+            'res' => true,
+            'data' => $objetives
+        ), 200);
+    }
+
 
     // FUNCION PARA BORRAR UN OBJETIVO INDIVIDUAL
     public function Delete(Request $request, $uuid)

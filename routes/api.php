@@ -16,6 +16,7 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\TracingController;
 use App\Http\Controllers\TrainingActionsController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\stateIndividualObjectives;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route as RoutingRoute;
 use Illuminate\Support\Facades\Route;
@@ -119,7 +120,9 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::post('create', [ObjectivesIndividualController::class, 'Create']);
         Route::post('getAll', [ObjectivesIndividualController::class, 'FindAll']);
         Route::get('getOne/{uuid}', [ObjectivesIndividualController::class, 'FindOne']);
+        Route::get('FindAllByUserUniqueId/{uuid}', [ObjectivesIndividualController::class, 'FindAllByUserUniqueId']);
         Route::delete('delete/{uuid}', [ObjectivesIndividualController::class, 'Delete']);
+        Route::put('UpdateState/{uuid}', [ObjectivesIndividualController::class, 'UpdateState']);
     });
 
     Route::group([
@@ -157,6 +160,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
             Route::put('update/{uuid}', [TrainingActionsController::class, 'Update']);
             Route::post('getAll', [TrainingActionsController::class, 'FindAll']);
             Route::delete('delete/{uuid}', [TrainingActionsController::class, 'Delete']);
+            Route::get('FindAllByUserUniqueId/{uuid}', [TrainingActionsController::class, 'FindAllByUserUniqueId']);
         }
     );
 
@@ -169,6 +173,16 @@ Route::group(['middleware' => ['jwt.verify']], function () {
             Route::put('update/{uuid}', [FeedbackActionsController::class, 'Update']);
             Route::post('getAll', [FeedbackActionsController::class, 'FindAll']);
             Route::delete('delete/{uuid}', [FeedbackActionsController::class, 'Delete']);
+            Route::get('FindAllByUserUniqueId/{uuid}', [FeedbackActionsController::class, 'FindAllByUserUniqueId']);
+        }
+    );
+
+    Route::group(
+        [
+            'prefix' => 'stateObjectives'
+        ],
+        function ($router) {
+            Route::post('index', [stateIndividualObjectives::class, 'index']);
         }
     );
 });

@@ -65,6 +65,21 @@ class TrainingActionsController extends Controller
         ], 200);
     }
 
+    public function FindAllByUserUniqueId(Request $request, $uuid)
+    {
+        // Buscar todos los objetivos individuales del usuario por su unique_id
+        $objetives = TrainingActions::where('user_id', function ($query) use ($uuid) {
+            $query->select('id')
+                ->from('users')
+                ->where('unique_id', $uuid);
+        })->get();
+
+        return response()->json(array(
+            'res' => true,
+            'data' => $objetives
+        ), 200);
+    }
+
     public function FindAll(Request $request)
     {
         $paginate = $request->all()['paginate'];
