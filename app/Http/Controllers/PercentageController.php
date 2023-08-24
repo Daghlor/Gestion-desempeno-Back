@@ -67,4 +67,42 @@ class PercentageController extends Controller
             'total_users' => $totalUsers,
         ]);
     }
+
+    public function countClosedVsApprovedIndividuals()
+    {
+        // Consulta para obtener el recuento de objetivos individuales cambiados de estado a "cerrados" y "aprobados"
+        $counts = DB::table('objectives_individuals')
+            ->select(
+                DB::raw('SUM(CASE WHEN state_id = 4 THEN 1 ELSE 0 END) as closed_count'), // Suponemos que el ID del estado "cerrado" es 2
+                DB::raw('SUM(CASE WHEN state_id = 2 THEN 1 ELSE 0 END) as approved_count') // Suponemos que el ID del estado "aprobado" es 1
+            )
+            ->first(); // Obtenemos solo una fila de resultados
+
+        return response()->json([
+            'closed_count' => $counts->closed_count,
+            'approved_count' => $counts->approved_count,
+        ], 200);
+    }
+
+    public function countPendingVsApprovedVsUsers()
+    {
+        // Consulta para obtener el recuento de objetivos individuales con estado "pendiente de aprobación"
+        $pendingCount = DB::table('objectives_individuals')
+            ->where('state_id', 1) // Suponemos que el ID del estado "pendiente de aprobación" es 1
+            ->count();
+
+        // Consulta para obtener el recuento de objetivos individuales con estado "aprobado"
+        $approvedCount = DB::table('objectives_individuals')
+            ->where('state_id', 2) // Suponemos que el ID del estado "aprobado" es 2
+            ->count();
+
+        // Obtiene el total de usuarios registrados (supongamos que están en una tabla llamada 'users')
+        $totalUsers = DB::table('users')->count();
+
+        return response()->json([
+            'pending_count' => $pendingCount,
+            'approved_count' => $approvedCount,
+            'total_users' => $totalUsers,
+        ], 200);
+    }
 }

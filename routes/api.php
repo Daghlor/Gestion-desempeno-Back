@@ -149,6 +149,8 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         // Route::post('calculatePercentage', [PercentageController::class, 'calculatePercentage']);
         Route::post('countIndividualsAlignedWithStrategics', [PercentageController::class, 'countIndividualsAlignedWithStrategics']);
         Route::post('getTotal', [PercentageController::class, 'getTotal']);
+        Route::post('countClosedVsApprovedIndividuals', [PercentageController::class, 'countClosedVsApprovedIndividuals']);
+        Route::post('countPendingVsApprovedVsUsers', [PercentageController::class, 'countPendingVsApprovedVsUsers']);
     });
 
     Route::group(

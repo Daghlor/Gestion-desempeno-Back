@@ -98,7 +98,8 @@ class ObjectivesIndividualController extends Controller
             ->get([
                 'objectives_individuals.unique_id',  'objectives_individuals.objetive', 'objectives_individuals.weight',
                 'objectives_individuals.title', 'objectives_strategics.title as title_strategics', 'users.identify',
-                DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"),  'states_objectives.description as state'
+                DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"),  'states_objectives.description as state',
+                'states_objectives.id as state_id'
             ]);
 
 
