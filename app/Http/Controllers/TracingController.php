@@ -21,7 +21,9 @@ class TracingController extends Controller
             'comment' => $request->all()['comment'],
             'user_id' => auth()->user()->id,
             'individual_id' => $request->all()['individual_id'],
-            'plans_id' => $request->all()['plans_id'],
+            // 'plans_id' => $request->all()['plans_id'],
+            'user_role_id' => $request->input('user_role_id'), // Agregar el user_role_id
+            'weight' => $request->input('weight'), // Agregar el weight
         ]);
 
         return response()->json(array(
@@ -91,7 +93,7 @@ class TracingController extends Controller
             ->offset(($page - 1) * $paginate)
             ->orderBy($column, $direction)
             ->get([
-                'tracings.unique_id',  'tracings.comment', DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"), 'tracings.created_at'
+                'tracings.unique_id',  'tracings.comment', 'tracings.user_role_id', 'tracings.weight', DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"), 'tracings.created_at'
             ]);
 
 

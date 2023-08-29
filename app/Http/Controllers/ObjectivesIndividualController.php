@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ObjectivesIndividual;
 use App\Models\ObjectivesStrategics;
+use App\Models\StatesObjectives;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -164,6 +165,15 @@ class ObjectivesIndividualController extends Controller
                 $objetivo->title_strategics = $strategic->title;
             } else {
                 $objetivo->title_strategics = null;
+            }
+        }
+
+        foreach ($objetives as $objetivo) {
+            $state = StatesObjectives::find($objetivo->state_id);
+            if ($state) {
+                $objetivo->title_state = $state->description;
+            } else {
+                $objetivo->title_state = null;
             }
         }
 
