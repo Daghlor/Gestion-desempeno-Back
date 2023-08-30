@@ -215,16 +215,23 @@ return new class extends Migration
             'code' => 'View reports'
         ]);
 
-        for ($i = 1; $i < 33; $i++) {
-            if ($i != 18 || $i != 22) {
+        Permissions::create([
+            'id' => 33,
+            'unique_id' => Str::uuid()->toString(),
+            'description' => 'Listar mis seguimientos',
+            'code' => 'List_my_tracings'
+        ]);
+
+        for ($i = 1; $i < 34; $i++) {
+            if ($i != 18 && $i != 33) {
                 RolesPermissions::create([
                     'rol_id' => 3,
                     'permissions_id' => $i,
                 ]);
             }
         }
-        for ($i = 5; $i < 33; $i++) {
-            if ($i != 21 || $i != 22 || $i != 23) {
+        for ($i = 5; $i < 34; $i++) {
+            if ($i != 21 && $i != 23 && $i != 33) {
                 RolesPermissions::create([
                     'rol_id' => 1,
                     'permissions_id' => $i,
@@ -241,11 +248,11 @@ return new class extends Migration
         ]);
         RolesPermissions::create([
             'rol_id' => 2,
-            'permissions_id' => 24,
+            'permissions_id' => 25,
         ]);
         RolesPermissions::create([
             'rol_id' => 2,
-            'permissions_id' => 25,
+            'permissions_id' => 33,
         ]);
     }
 
