@@ -19,6 +19,8 @@ class Tracing extends Model
         'individual_id',
         'plans_id',
         'weight',
-        'user_role_id',
+        'comment_employee',
+        'user_id_jefe',
+        'user_id_empleado',
     ];
 }

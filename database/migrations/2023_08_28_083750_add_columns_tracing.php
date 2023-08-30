@@ -14,9 +14,8 @@ return new class extends Migration
     public function up()
     {
         Schema::table('tracings', function (Blueprint $table) {
-            $table->integer('weight');
-            $table->unsignedBigInteger('user_role_id');
-            $table->foreign('user_role_id')->references('id')->on('roles_users');
+            $table->integer('weight')->nullable();;
+            $table->string('comment_employee')->nullable();
         });
     }
 

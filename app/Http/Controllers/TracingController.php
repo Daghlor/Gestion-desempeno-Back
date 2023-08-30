@@ -7,6 +7,8 @@ namespace App\Http\Controllers;
 use App\Models\ObjectivesIndividual;
 use App\Models\Tracing;
 use App\Models\User;
+use App\Models\RolesUsers;
+use App\Models\Roles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -14,26 +16,86 @@ use Illuminate\Support\Str;
 class TracingController extends Controller
 {
     // FUNCION PARA CREAR O REGISTRAR UN SEGUIMIENTO
-    public function Create(Request $request)
-    {
-        $tracing = Tracing::create([
-            'unique_id' => Str::uuid()->toString(),
-            'comment' => $request->all()['comment'],
-            'user_id' => auth()->user()->id,
-            'individual_id' => $request->all()['individual_id'],
-            // 'plans_id' => $request->all()['plans_id'],
-            'user_role_id' => $request->input('user_role_id'), // Agregar el user_role_id
-            'weight' => $request->input('weight'), // Agregar el weight
-        ]);
 
-        return response()->json(array(
-            'res' => true,
-            'data' => [
-                'tracing' => $tracing->unique_id,
-                'msg' => 'Seguimiento Creado Correctamente'
-            ]
-        ), 200);
+    public function create(Request $request)
+    {
+        // Obtén el usuario autenticado
+        $user = auth()->user();
+
+        // Obtén el rol del usuario
+        $userRole = $user->roles->first()->description;
+
+        // Asegúrate de que el usuario tenga el rol adecuado (Administrador o Super Administrador)
+        if ($userRole === 'Administrador' || $userRole === 'Super Administrador') {
+            // Crea un nuevo seguimiento con los datos del formulario
+            $tracing = new Tracing([
+                'unique_id' => Str::uuid()->toString(),
+                'user_id' => $user->id,
+                'individual_id' => $request->input('individual_id'),
+                'plans_id' => $request->input('plans_id'),
+                'weight' => $request->input('weight'),
+                'comment' => $request->input('comment'), // Comentario del jefe
+            ]);
+
+            $tracing->save();
+
+            return response()->json([
+                'res' => true,
+                'data' => [
+                    'tracing' => $tracing->unique_id,
+                    'user_role' => $userRole, // Indica el rol del usuario
+                    'msg' => 'Seguimiento Creado Correctamente por el Jefe'
+                ]
+            ], 200);
+        } else {
+            return response()->json([
+                'res' => false,
+                'msg' => 'No tienes permisos para realizar esta acción.'
+            ], 403);
+        }
     }
+
+    public function addEmployeeComment(Request $request, $uuid)
+    {
+        // Obtén el usuario autenticado
+        $user = auth()->user();
+
+        // Verifica si el usuario tiene el rol de Empleado
+        if ($user->roles->contains('description', 'Empleado')) {
+            // Busca el seguimiento por su unique_id
+            $tracing = Tracing::where('unique_id', $uuid)->first();
+
+            // Verifica si el seguimiento existe
+            if ($tracing) {
+                // Agrega el comentario del empleado
+                $tracing->comment_employee = $request->input('comment_employee');
+                $tracing->save();
+
+                return response()->json([
+                    'res' => true,
+                    'data' => [
+                        'tracing' => $tracing->unique_id,
+                        'user_role' => 'Empleado',
+                        'comment_employee' => $tracing->comment_employee, // Puedes obtener el rol aquí si es necesario
+                        'msg' => 'Comentario del Empleado agregado correctamente'
+                    ]
+                ], 200);
+            } else {
+                return response()->json([
+                    'res' => false,
+                    'msg' => 'El seguimiento no existe.'
+                ], 404);
+            }
+        } else {
+            return response()->json([
+                'res' => false,
+                'msg' => 'No tienes permisos para realizar esta acción.'
+            ], 403);
+        }
+    }
+
+
+
 
     // FUNCION PARA BUSCAR O TRAER EL SEGUIMIENTO DE UN USUARIO QUE YA HAYA TENIDO UN SEGUIMIENTO
     public function FindUserTracing(Request $request)
@@ -77,42 +139,47 @@ class TracingController extends Controller
     // FUNCION PARA BUSCAR O TRAER TODOS LOS SEGUIMIENTOS
     public function FindAll(Request $request)
     {
-        $paginate = $request->all()['paginate'];
-        $page = $request->all()['page'];
-        $column = $request->all()['column'];
-        $direction = $request->all()['direction'];
-        $search = $request->all()['search'];
+        $paginate = $request->input('paginate', 10);
+        $page = $request->input('page', 1);
+        $column = $request->input('column', 'created_at');
+        $direction = $request->input('direction', 'desc');
+        $search = $request->input('search', []);
 
-        $tracings = Tracing::leftjoin('users', 'users.id', '=', 'tracings.user_id');
-        if (count($search) > 0) {
-            if (isset($search['individual_id'])) {
-                $tracings = $tracings->where('tracings.individual_id', $search['individual_id']);
-            }
-        }
-        $tracings = $tracings->limit($paginate)
-            ->offset(($page - 1) * $paginate)
-            ->orderBy($column, $direction)
-            ->get([
-                'tracings.unique_id',  'tracings.comment', 'tracings.user_role_id', 'tracings.weight', DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"), 'tracings.created_at'
+        $query = Tracing::join('users', 'users.id', '=', 'tracings.user_id')
+            ->join('roles_users', 'roles_users.user_id', '=', 'users.id')
+            ->join('roles', 'roles.id', '=', 'roles_users.rol_id')
+            ->select([
+                'tracings.unique_id',
+                'tracings.comment',
+                'tracings.comment_employee', // Agrega el comentario del empleado
+                'users.name AS userName',
+                'users.lastName AS userLastName',
+                'roles.description AS userRoleDescription',
+                'tracings.created_at'
             ]);
 
-
-        $counts = Tracing::leftjoin('users', 'users.id', '=', 'tracings.user_id');
-        if (count($search) > 0) {
+        if (!empty($search)) {
             if (isset($search['individual_id'])) {
-                $counts = $counts->where('tracings.individual_id', $search['individual_id']);
+                $query->where('tracings.individual_id', $search['individual_id']);
             }
         }
-        $counts = $counts->get(['tracings.unique_id']);
 
-        return response()->json(array(
+        $total = $query->count();
+
+        $tracings = $query->orderBy($column, $direction)
+            ->limit($paginate)
+            ->offset(($page - 1) * $paginate)
+            ->get();
+
+        return response()->json([
             'res' => true,
             'data' => [
-                'tracings' => $tracings,
-                'total' => count($counts)
+                'seguimientos' => $tracings,
+                'total' => $total
             ]
-        ), 200);
+        ], 200);
     }
+
 
     // FUNCION PARA BUSCAR UN SOLO SEGUIMIENTO POR SU UNIQUE_ID
     public function FindOne(Request $request, $uuid)

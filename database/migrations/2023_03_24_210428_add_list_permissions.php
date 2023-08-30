@@ -208,7 +208,14 @@ return new class extends Migration
             'code' => 'view_other_users_plans'
         ]);
 
-        for ($i = 1; $i < 32; $i++) {
+        Permissions::create([
+            'id' => 32,
+            'unique_id' => Str::uuid()->toString(),
+            'description' => 'Ver informes',
+            'code' => 'View reports'
+        ]);
+
+        for ($i = 1; $i < 33; $i++) {
             if ($i != 18 || $i != 22) {
                 RolesPermissions::create([
                     'rol_id' => 3,
@@ -216,7 +223,7 @@ return new class extends Migration
                 ]);
             }
         }
-        for ($i = 5; $i < 32; $i++) {
+        for ($i = 5; $i < 33; $i++) {
             if ($i != 21 || $i != 22 || $i != 23) {
                 RolesPermissions::create([
                     'rol_id' => 1,
@@ -231,6 +238,14 @@ return new class extends Migration
         RolesPermissions::create([
             'rol_id' => 2,
             'permissions_id' => 23,
+        ]);
+        RolesPermissions::create([
+            'rol_id' => 2,
+            'permissions_id' => 24,
+        ]);
+        RolesPermissions::create([
+            'rol_id' => 2,
+            'permissions_id' => 25,
         ]);
     }
 

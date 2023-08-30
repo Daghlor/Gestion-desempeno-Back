@@ -132,6 +132,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::post('getAll', [TracingController::class, 'FindAll']);
         Route::post('getAll/users', [TracingController::class, 'FindUserTracing']);
         Route::get('getOne/{uuid}', [TracingController::class, 'FindOne']);
+        Route::put('addEmployeeComment/{uuid}', [TracingController::class, 'addEmployeeComment']);
     });
 
     Route::group([

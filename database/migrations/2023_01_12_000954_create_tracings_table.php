@@ -17,7 +17,7 @@ return new class extends Migration
         Schema::create('tracings', function (Blueprint $table) {
             $table->bigIncrements('id')->unsigned();
             $table->string('unique_id', 50)->unique();
-            $table->string('comment', 550);
+            $table->string('comment', 550)->nullable();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('individual_id');
             $table->foreign('user_id')->references('id')->on('users');
