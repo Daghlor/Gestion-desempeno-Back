@@ -69,6 +69,7 @@ class TracingController extends Controller
             if ($tracing) {
                 // Agrega el comentario del empleado
                 $tracing->comment_employee = $request->input('comment_employee');
+                $tracing->weight = $request->input('weight'); // Agrega el peso ingresado por el empleado
                 $tracing->save();
 
                 return response()->json([
@@ -76,7 +77,8 @@ class TracingController extends Controller
                     'data' => [
                         'tracing' => $tracing->unique_id,
                         'user_role' => 'Empleado',
-                        'comment_employee' => $tracing->comment_employee, // Puedes obtener el rol aquí si es necesario
+                        'comment_employee' => $tracing->comment_employee,
+                        'weight' => $tracing->weight, // Devuelve el peso ingresado por el empleado
                         'msg' => 'Comentario del Empleado agregado correctamente'
                     ]
                 ], 200);
@@ -93,6 +95,7 @@ class TracingController extends Controller
             ], 403);
         }
     }
+
 
 
 
@@ -197,12 +200,22 @@ class TracingController extends Controller
 
         for ($i = 0; $i < count($objetives); $i++) {
             $objetives[$i]['tracing'] = Tracing::where('individual_id', $objetives[$i]->id)->orderBy('created_at', 'desc')->get();
+
+            $totalPoints = 100; // Inicializa los puntos disponibles para cada objetivo individual
+
+            // Recorre los seguimientos y resta sus pesos de los puntos totales
+            foreach ($objetives[$i]['tracing'] as $tracing) {
+                $totalPoints -= $tracing->weight;
+            }
+
+            // Agrega el total de puntos disponibles para este objetivo individual
+            $objetives[$i]['totalPoints'] = $totalPoints;
         }
 
-        return response()->json(array(
+        return response()->json([
             'res' => true,
             'data' => $objetives,
             'user' => $user
-        ), 200);
+        ], 200);
     }
 }
