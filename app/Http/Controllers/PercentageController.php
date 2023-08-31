@@ -9,6 +9,8 @@ use App\Http\Controllers\ObjectivesIndividualController;
 use App\Models\ObjectivesStrategics;
 use App\Models\ObjectivesIndividual;
 use Illuminate\Support\Facades\DB;
+use App\Models\Tracing;
+use App\Models\User;
 
 class PercentageController extends Controller
 {
@@ -103,6 +105,43 @@ class PercentageController extends Controller
             'pending_count' => $pendingCount,
             'approved_count' => $approvedCount,
             'total_users' => $totalUsers,
+        ], 200);
+    }
+
+    public function FindOne(Request $request, $uuid)
+    {
+        $user = User::where('unique_id', $uuid)->first(['id', 'name', 'lastName', 'identify', 'phone', 'email']);
+        $objetives = ObjectivesIndividual::where('objectives_individuals.user_id', $user->id)
+            ->join('objectives_strategics', 'objectives_strategics.id', '=', 'objectives_individuals.strategic_id')
+            ->join('states_objectives', 'states_objectives.id', '=', 'objectives_individuals.state_id')
+            ->get([
+                'objectives_individuals.id', 'objectives_individuals.unique_id', 'objectives_individuals.title',
+                'objectives_individuals.objetive', 'objectives_strategics.title as title_strategics',
+                'objectives_individuals.weight', 'objectives_individuals.strategic_id', 'objectives_individuals.state_id',
+                'objectives_individuals.created_at', 'states_objectives.description as state', 'objectives_individuals.plans_id',
+            ]);
+
+        for ($i = 0; $i < count($objetives); $i++) {
+            $objetives[$i]['tracing'] = Tracing::where('individual_id', $objetives[$i]->id)->orderBy('created_at', 'desc')->get();
+
+            $totalPointsAvailable = 100; // Inicializa los puntos disponibles para cada objetivo individual
+            $totalPointsAssigned = 0; // Inicializa los puntos asignados para cada objetivo individual
+
+            // Recorre los seguimientos y resta sus pesos de los puntos totales disponibles
+            foreach ($objetives[$i]['tracing'] as $tracing) {
+                $totalPointsAvailable -= $tracing->weight;
+                $totalPointsAssigned += $tracing->weight;
+            }
+
+            // Agrega los totales de puntos disponibles y asignados para este objetivo individual
+            $objetives[$i]['totalPointsAvailable'] = $totalPointsAvailable;
+            $objetives[$i]['totalPointsAssigned'] = $totalPointsAssigned;
+        }
+
+        return response()->json([
+            'res' => true,
+            'data' => $objetives,
+            'user' => $user
         ], 200);
     }
 }

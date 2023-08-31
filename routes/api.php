@@ -152,6 +152,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::post('getTotal', [PercentageController::class, 'getTotal']);
         Route::post('countClosedVsApprovedIndividuals', [PercentageController::class, 'countClosedVsApprovedIndividuals']);
         Route::post('countPendingVsApprovedVsUsers', [PercentageController::class, 'countPendingVsApprovedVsUsers']);
+        Route::get('FindOne/{uuid}', [PercentageController::class, 'FindOne']);
     });
 
     Route::group(

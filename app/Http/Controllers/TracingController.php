@@ -201,15 +201,18 @@ class TracingController extends Controller
         for ($i = 0; $i < count($objetives); $i++) {
             $objetives[$i]['tracing'] = Tracing::where('individual_id', $objetives[$i]->id)->orderBy('created_at', 'desc')->get();
 
-            $totalPoints = 100; // Inicializa los puntos disponibles para cada objetivo individual
+            $totalPointsAvailable = 100; // Inicializa los puntos disponibles para cada objetivo individual
+            $totalPointsAssigned = 0; // Inicializa los puntos asignados para cada objetivo individual
 
-            // Recorre los seguimientos y resta sus pesos de los puntos totales
+            // Recorre los seguimientos y resta sus pesos de los puntos totales disponibles
             foreach ($objetives[$i]['tracing'] as $tracing) {
-                $totalPoints -= $tracing->weight;
+                $totalPointsAvailable -= $tracing->weight;
+                $totalPointsAssigned += $tracing->weight;
             }
 
-            // Agrega el total de puntos disponibles para este objetivo individual
-            $objetives[$i]['totalPoints'] = $totalPoints;
+            // Agrega los totales de puntos disponibles y asignados para este objetivo individual
+            $objetives[$i]['totalPointsAvailable'] = $totalPointsAvailable;
+            $objetives[$i]['totalPointsAssigned'] = $totalPointsAssigned;
         }
 
         return response()->json([
