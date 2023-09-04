@@ -38,7 +38,7 @@ class PercentageController extends Controller
     //     ], 200);
     // }
 
-    // grafica Numero de objetivos personales alineados a objetivos estratégicos
+    //Grafica Numero de objetivos personales alineados a objetivos estratégicos
     public function countIndividualsAlignedWithStrategics()
     {
         $counts = DB::table('objectives_individuals')
