@@ -11,6 +11,7 @@ use App\Models\ObjectivesIndividual;
 use Illuminate\Support\Facades\DB;
 use App\Models\Tracing;
 use App\Models\User;
+use App\Models\Company;
 
 class PercentageController extends Controller
 {
@@ -39,22 +40,54 @@ class PercentageController extends Controller
     // }
 
     //Grafica Numero de objetivos personales alineados a objetivos estratégicos
-    public function countIndividualsAlignedWithStrategics()
+    // public function countIndividualsAlignedWithStrategics()
+    // {
+    //     $counts = DB::table('objectives_individuals')
+    //         ->select(
+    //             'objectives_individuals.strategic_id',
+    //             DB::raw('count(*) as count'),
+    //             DB::raw('(SELECT unique_id FROM objectives_strategics WHERE id = objectives_individuals.strategic_id) as unique_id_strategics'),
+    //             DB::raw('(SELECT title FROM objectives_strategics WHERE id = objectives_individuals.strategic_id) as title_strategics')
+    //         )
+    //         ->groupBy('objectives_individuals.strategic_id')
+    //         ->get();
+
+    //     return response()->json([
+    //         'data' => $counts,
+    //     ], 200);
+    // }
+
+    public function countIndividualsAlignedWithStrategics(Request $request, $companyUniqueId)
     {
+        // Busca la empresa por su unique_id
+        $company = Company::where('unique_id', $companyUniqueId)->first();
+
+        if (!$company) {
+            return response()->json(['error' => 'Empresa no encontrada'], 404);
+        }
+
+        // Obtiene los objetivos estratégicos relacionados con la empresa y sus conteos de objetivos individuales
         $counts = DB::table('objectives_individuals')
+            ->join('objectives_strategics', 'objectives_individuals.strategic_id', '=', 'objectives_strategics.id')
             ->select(
                 'objectives_individuals.strategic_id',
                 DB::raw('count(*) as count'),
                 DB::raw('(SELECT unique_id FROM objectives_strategics WHERE id = objectives_individuals.strategic_id) as unique_id_strategics'),
                 DB::raw('(SELECT title FROM objectives_strategics WHERE id = objectives_individuals.strategic_id) as title_strategics')
             )
+            ->where('objectives_strategics.company_id', $company->id)
             ->groupBy('objectives_individuals.strategic_id')
             ->get();
 
         return response()->json([
+            'company_name' => $company->businessName, // Agrega el nombre de la empresa
             'data' => $counts,
         ], 200);
     }
+
+
+
+
 
     public function getTotal()
     {
@@ -142,6 +175,43 @@ class PercentageController extends Controller
             'res' => true,
             'data' => $objetives,
             'user' => $user
+        ], 200);
+    }
+
+    public function calculateResultsForStrategicObjective(Request $request, $uuid)
+    {
+        // Verifica si el objetivo estratégico con el UUID proporcionado existe
+        $strategicObjective = ObjectivesStrategics::where('unique_id', $uuid)->first();
+
+        if (!$strategicObjective) {
+            return response()->json([
+                'error' => 'El objetivo estratégico no existe',
+            ], 404);
+        }
+
+        // Obtén todos los objetivos individuales alineados a este objetivo estratégico
+        $individualObjectives = ObjectivesIndividual::where('strategic_id', $strategicObjective->id)->get();
+
+        $totalResults = 0;
+
+        // Recopila el título del objetivo estratégico
+        $strategicTitle = $strategicObjective->title;
+
+        // Recorre todos los objetivos individuales y suma sus resultados
+        foreach ($individualObjectives as $individualObjective) {
+            // Suma los pesos (weights) de los registros de seguimiento para este objetivo individual
+            $results = Tracing::where('individual_id', $individualObjective->id)->sum('weight');
+
+            $totalResults += $results;
+        }
+
+        // Calcula el promedio dividiendo la suma de los resultados entre el número de objetivos individuales
+        $averageResult = count($individualObjectives) > 0 ? $totalResults / count($individualObjectives) : 0;
+
+        return response()->json([
+            'strategic_title' => $strategicTitle, // Agrega el título del objetivo estratégico
+            'total_results' => $totalResults,
+            'average_result' => $averageResult,
         ], 200);
     }
 }
