@@ -1,5 +1,6 @@
 <?php
 
+// CONTROLADOR DEL ESTADO DE LOS OBJETIVOS INDIVIDUALES
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -25,3 +26,9 @@ class stateIndividualObjectives extends Controller
         }
     }
 }
+
+// Copyright (c) Engagement
+// https://www.engagement.com.co/
+// Año: 2023
+// Sistema: Gestion de desempeño (GDD)
+// Programador: David Tuta

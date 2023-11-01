@@ -105,6 +105,66 @@ class ObjectivesStrategicsController extends Controller
     }
 
 
+    // FUNCION PARA BUSCAR TODOS LOS OBJETIVOS ESTRATEGICOS QUE CONTIENEN OBJETIVOS INDIVIDUALES
+    public function findAllWithIndividualObjectives(Request $request)
+    {
+        $paginate = $request->input('paginate', 10);
+        $page = $request->input('page', 1);
+        $column = $request->input('column', 'created_at');
+        $direction = $request->input('direction', 'asc');
+        $search = $request->input('search', []);
+
+        $query = ObjectivesStrategics::select([
+            'objectives_strategics.unique_id',
+            'objectives_strategics.title',
+            'objectives_strategics.mission',
+            'objectives_strategics.vision',
+            'objectives_strategics.totalWeight',
+            'companies.businessName as company',
+            DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"),
+            'users.identify',
+            'areas.description as area',
+            'states.description as state',
+        ])
+            ->join('companies', 'companies.id', '=', 'objectives_strategics.company_id')
+            ->join('areas', 'areas.id', '=', 'objectives_strategics.areas_id')
+            ->join('users', 'users.id', '=', 'objectives_strategics.user_id')
+            ->join('states', 'states.id', '=', 'objectives_strategics.state_id');
+
+        // Aplica filtros de búsqueda si se proporcionan
+        if (!empty($search)) {
+            if (isset($search['user_id'])) {
+                $query->where('objectives_strategics.user_id', $search['user_id']);
+            }
+            if (isset($search['areas_id'])) {
+                $query->where('objectives_strategics.areas_id', $search['areas_id']);
+            }
+            if (isset($search['company_id'])) {
+                $query->where('objectives_strategics.company_id', $search['company_id']);
+            }
+            if (isset($search['state_id'])) {
+                $query->where('objectives_strategics.state_id', $search['state_id']);
+            }
+        }
+
+        // Filtra los objetivos estratégicos que tienen objetivos individuales alineados
+        $query->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('objectives_individuals')
+                ->whereColumn('objectives_individuals.strategic_id', 'objectives_strategics.id');
+        });
+
+        // Pagina los resultados
+        $objetives = $query->orderBy($column, $direction)
+            ->paginate($paginate, ['*'], 'page', $page);
+
+        return response()->json([
+            'res' => true,
+            'data' => [
+                'objetives' => $objetives,
+            ],
+        ], 200);
+    }
 
     // FUNCION PARA BUSCAR UN SOLO OBJETIVO ESTRATEGICO POR SU UNIQUE_ID
     public function FindOne(Request $request, $uuid)
@@ -135,3 +195,9 @@ class ObjectivesStrategicsController extends Controller
         ), 200);
     }
 }
+
+// Copyright (c) Engagement
+// https://www.engagement.com.co/
+// Año: 2023
+// Sistema: Gestion de desempeño (GDD)
+// Programador: David Tuta

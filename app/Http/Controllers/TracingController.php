@@ -96,10 +96,6 @@ class TracingController extends Controller
         }
     }
 
-
-
-
-
     // FUNCION PARA BUSCAR O TRAER EL SEGUIMIENTO DE UN USUARIO QUE YA HAYA TENIDO UN SEGUIMIENTO
     public function FindUserTracing(Request $request)
     {
@@ -222,3 +218,9 @@ class TracingController extends Controller
         ], 200);
     }
 }
+
+// Copyright (c) Engagement
+// https://www.engagement.com.co/
+// Año: 2023
+// Sistema: Gestion de desempeño (GDD)
+// Programador: David Tuta

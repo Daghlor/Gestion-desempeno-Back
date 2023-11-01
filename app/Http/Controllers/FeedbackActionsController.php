@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+// CONTROLADOR DE ACCIONES DE RETROALIMENTACION CON FUNCIONES TIPO
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\FeedbackActions;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class FeedbackActionsController extends Controller
 {
+    // FUNCION PARA CREAR UNA ACCION DE RETROALIMENTACION
     public function Create(Request $request)
     {
         $title = $request->input('title'); // Obtener el título del Request
@@ -38,7 +40,7 @@ class FeedbackActionsController extends Controller
         ), 200);
     }
 
-
+    // FUNCION PARA ACTUALIZAR UNA ACCION DE RETROALIMENTACION
     public function Update(Request $request, $uuid)
     {
         $feedback = FeedbackActions::where('unique_id', $uuid)->first();
@@ -69,6 +71,7 @@ class FeedbackActionsController extends Controller
         ], 200);
     }
 
+    // FUNCION PARA BUSCAR TODAS LAS ACCIONES CREADAS POR EL UNIQUE_ID DEL USUARIO
     public function FindAllByUserUniqueId(Request $request, $uuid)
     {
         // Buscar todos los objetivos individuales del usuario por su unique_id
@@ -84,6 +87,7 @@ class FeedbackActionsController extends Controller
         ), 200);
     }
 
+    // FUNCION PARA BUSCAR TODAS LAS ACCIONES DE RETROALIMENTACION
     public function FindAll(Request $request)
     {
         $paginate = $request->all()['paginate'];
@@ -120,6 +124,7 @@ class FeedbackActionsController extends Controller
         ], 200);
     }
 
+    // FUNCION PARA ELIMINAR UNA ACCION DE RETROALIMENTACION
     public function Delete($uuid)
     {
         $feedback = FeedbackActions::where('unique_id', $uuid)->first();
@@ -139,3 +144,9 @@ class FeedbackActionsController extends Controller
         ], 200);
     }
 }
+
+// Copyright (c) Engagement
+// https://www.engagement.com.co/
+// Año: 2023
+// Sistema: Gestion de desempeño (GDD)
+// Programador: David Tuta

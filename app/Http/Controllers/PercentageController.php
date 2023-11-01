@@ -1,5 +1,6 @@
 <?php
 
+// CONTROLADOR DE TODAS LAS GRAFICAS DEL SISTEMA CON SUS FUNCIONES LOGICAS
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
@@ -15,48 +16,8 @@ use App\Models\Company;
 
 class PercentageController extends Controller
 {
-    // public function calculatePercentage(Request $request)
-    // {
-    //     $strategicsController = new ObjectivesStrategicsController();
-    //     $strategicsResponse = $strategicsController->FindAll($request);
-    //     $totalStrategics = $strategicsResponse->getData()->data->total;
 
-    //     $individualController = new ObjectivesIndividualController();
-    //     $individualsResponse = $individualController->FindAll($request);
-    //     $totalIndividuals = $individualsResponse->getData()->data->total;
-
-    //     // Calcular el total de objetivos individuales alcanzados
-    //     $totalTargetedResponse = $individualController->FindAllTargeted($request);
-    //     $totalTargeted = $totalTargetedResponse->getData()->data->total_targeted ?? 0;
-
-    //     $percentage = ($totalIndividuals > 0) ? ($totalTargeted / $totalIndividuals) * 100 : 0;
-
-    //     return response()->json([
-    //         'total_strategics' => $totalStrategics,
-    //         'total_individuals' => $totalIndividuals,
-    //         'targeted_individuals' => $totalTargeted,
-    //         'percentage' => $percentage
-    //     ], 200);
-    // }
-
-    //Grafica Numero de objetivos personales alineados a objetivos estratégicos
-    // public function countIndividualsAlignedWithStrategics()
-    // {
-    //     $counts = DB::table('objectives_individuals')
-    //         ->select(
-    //             'objectives_individuals.strategic_id',
-    //             DB::raw('count(*) as count'),
-    //             DB::raw('(SELECT unique_id FROM objectives_strategics WHERE id = objectives_individuals.strategic_id) as unique_id_strategics'),
-    //             DB::raw('(SELECT title FROM objectives_strategics WHERE id = objectives_individuals.strategic_id) as title_strategics')
-    //         )
-    //         ->groupBy('objectives_individuals.strategic_id')
-    //         ->get();
-
-    //     return response()->json([
-    //         'data' => $counts,
-    //     ], 200);
-    // }
-
+    // FUNCION PARA CONTAR CUANTOS INDIVIDUALES ESTAN ALINEADOS A CIERTO ESTRATEGICO
     public function countIndividualsAlignedWithStrategics(Request $request, $companyUniqueId)
     {
         // Busca la empresa por su unique_id
@@ -85,10 +46,7 @@ class PercentageController extends Controller
         ], 200);
     }
 
-
-
-
-
+    // FUNCION DE GRAFICA PARA TENER EL TOTAL DE OBJETIVOS INDIVIDUALES Y EL TOTAL DE PERSONAS REGISTRADAS
     public function getTotal()
     {
         // Obtiene el total de objetivos individuales
@@ -103,6 +61,7 @@ class PercentageController extends Controller
         ]);
     }
 
+    // FUNCION PARA CONTAR LOS PLANES CERRADOS Y LOS PLANES APROBADOS
     public function countClosedVsApprovedIndividuals()
     {
         // Consulta para obtener el recuento de objetivos individuales cambiados de estado a "cerrados" y "aprobados"
@@ -119,6 +78,7 @@ class PercentageController extends Controller
         ], 200);
     }
 
+    // FUNCION PARA CONTAR LOS PLANES PENDIENTE, LOS PLANES APROBADOS Y EL TOTAL DE PERSONAS REGISTRADAS
     public function countPendingVsApprovedVsUsers()
     {
         // Consulta para obtener el recuento de objetivos individuales con estado "pendiente de aprobación"
@@ -141,6 +101,7 @@ class PercentageController extends Controller
         ], 200);
     }
 
+    // FUNCION PARA BUSCAR LOS OBJETIVOS INDIVIDUALES DE UN USUARIO Y VER EL PORCENTAJE DE AVANCE
     public function FindOne(Request $request, $uuid)
     {
         $user = User::where('unique_id', $uuid)->first(['id', 'name', 'lastName', 'identify', 'phone', 'email']);
@@ -178,6 +139,7 @@ class PercentageController extends Controller
         ], 200);
     }
 
+    // FUNCION QUE DA EL TOTAL DE PORCENTAJE DE AVANCE DE LOS OBJETIVOS ESTRATEGICOS DE LA EMPRESA
     public function calculateResultsForStrategicObjective(Request $request, $uuid)
     {
         // Verifica si el objetivo estratégico con el UUID proporcionado existe
@@ -215,3 +177,9 @@ class PercentageController extends Controller
         ], 200);
     }
 }
+
+// Copyright (c) Engagement
+// https://www.engagement.com.co/
+// Año: 2023
+// Sistema: Gestion de desempeño (GDD)
+// Programador: David Tuta

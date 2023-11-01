@@ -112,6 +112,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::post('getAll', [ObjectivesStrategicsController::class, 'FindAll']);
         Route::get('getOne/{uuid}', [ObjectivesStrategicsController::class, 'FindOne']);
         Route::delete('delete/{uuid}', [ObjectivesStrategicsController::class, 'Delete']);
+        Route::post('findAllWithIndividualObjectives', [ObjectivesStrategicsController::class, 'findAllWithIndividualObjectives']);
     });
 
     Route::group([

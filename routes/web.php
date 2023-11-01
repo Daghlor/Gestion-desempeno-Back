@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,4 +16,19 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+
+Route::get('/clear', function () {
+    Artisan::call('optimize:clear');
+    return redirect()->back();
+});
+
+
+Route::get('/clear-cache', function () {
+    // Ejecuta la acción para borrar la caché aquí
+    \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+
+    // Redirecciona de vuelta a la página anterior
+    return redirect()->back();
 });

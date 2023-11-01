@@ -37,6 +37,7 @@ class ObjectivesIndividualController extends Controller
         ), 200);
     }
 
+    // FUNCION PARA ACTUALIZAR EL ESTADO DEL OBJETIVO INDIVIDUAL
     public function UpdateState(Request $request, $uuid)
     {
         // Obtén el estado deseado desde la solicitud
@@ -149,6 +150,7 @@ class ObjectivesIndividualController extends Controller
         ), 200);
     }
 
+    // FUNCION PARA BUSCAR TODOS LOS OBJETIVOS INDIVIDUALES CREADOS POR EL UNIQUE_ID DEL USUARIO
     public function FindAllByUserUniqueId(Request $request, $uuid)
     {
         // Buscar todos los objetivos individuales del usuario por su unique_id
@@ -244,3 +246,9 @@ class ObjectivesIndividualController extends Controller
         ], 200);
     }
 }
+
+// Copyright (c) Engagement
+// https://www.engagement.com.co/
+// Año: 2023
+// Sistema: Gestion de desempeño (GDD)
+// Programador: David Tuta

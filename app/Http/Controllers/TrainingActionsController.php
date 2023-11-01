@@ -1,5 +1,6 @@
 <?php
 
+// CONTROLADOR DE LAS ACCIONES DE FORMACION CON FUNCIONES TIPO CRUD
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class TrainingActionsController extends Controller
 {
+    // FUNCION QUE CREA UNA ACCION DE FORMACION
     public function Create(Request $request)
     {
         $title = $request->input('title');
@@ -37,6 +39,7 @@ class TrainingActionsController extends Controller
         ), 200);
     }
 
+    // FUNCION QUE ACTUALIZA UNA ACCION DE FORMACION
     public function Update(Request $request, $uuid)
     {
 
@@ -65,6 +68,7 @@ class TrainingActionsController extends Controller
         ], 200);
     }
 
+    // FUNCION QUE BUSCA TODAS LAS ACCIONES CREADAS POR EL UNIQUE_ID DE UN USUARIO
     public function FindAllByUserUniqueId(Request $request, $uuid)
     {
         // Buscar todos los objetivos individuales del usuario por su unique_id
@@ -80,6 +84,7 @@ class TrainingActionsController extends Controller
         ), 200);
     }
 
+    // FUNCION PARA BUSCAR TODAS LAS ACCIONES DE FORMACION
     public function FindAll(Request $request)
     {
         $paginate = $request->all()['paginate'];
@@ -116,6 +121,7 @@ class TrainingActionsController extends Controller
         ], 200);
     }
 
+    // FUNCION PARA ELIMINAR UNA ACCION DE FORMACION
     public function Delete($uuid)
     {
 
@@ -136,3 +142,9 @@ class TrainingActionsController extends Controller
         ], 200);
     }
 }
+
+// Copyright (c) Engagement
+// https://www.engagement.com.co/
+// Año: 2023
+// Sistema: Gestion de desempeño (GDD)
+// Programador: David Tuta
