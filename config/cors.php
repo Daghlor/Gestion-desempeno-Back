@@ -17,7 +17,7 @@ return [
 
     'paths' => ['api/*'],
     'allowed_methods' => ['*'],
-    'allowed_origins' => ['https://gdd.kometa.com.co'],
+    'allowed_origins' => ['http://localhost:4200'],
     'allowed_headers' => ['*'],
     'exposed_headers' => [],
     'max_age' => 0,
