@@ -126,6 +126,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::post('getAll', [ObjectivesIndividualController::class, 'FindAll']);
         Route::get('getOne/{uuid}', [ObjectivesIndividualController::class, 'FindOne']);
         Route::get('FindAllByUserUniqueId/{uuid}', [ObjectivesIndividualController::class, 'FindAllByUserUniqueId']);
+        Route::get('FindAllByHierarchy/{id}', [ObjectivesIndividualController::class, 'FindAllByHierarchy']);
         Route::delete('delete/{uuid}', [ObjectivesIndividualController::class, 'Delete']);
         Route::put('UpdateState/{uuid}', [ObjectivesIndividualController::class, 'UpdateState']);
         Route::get('states', [ObjectivesIndividualController::class, 'GetAllStates']);
@@ -183,7 +184,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     Route::post('getAll', [UserHierarchyController::class, 'getAll']);
     Route::delete('delete/{userHierarchy}', [UserHierarchyController::class, 'destroy']);
     Route::delete('deleteAll', [UserHierarchyController::class, 'deleteAll']);
-    Route::get('findByUserUniqueId/{userUniqueId}', [UserHierarchyController::class, 'findByUserUniqueId']);
+    Route::get('assignedUsers/{id}', [UserHierarchyController::class, 'assignedUsers']);
 });
 
 

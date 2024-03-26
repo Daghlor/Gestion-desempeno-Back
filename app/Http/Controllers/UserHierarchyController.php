@@ -68,6 +68,14 @@ class UserHierarchyController extends Controller
         return response()->json($parent);
     }
 
+    public function assignedUsers($id)
+{
+    $assignedUsers = UserHierarchy::with('user')->where('parent_id', $id)->get();
+    return response()->json($assignedUsers);
+}
+
+
+
     public function deleteAll()
     {
         // Borra todas las jerarquías

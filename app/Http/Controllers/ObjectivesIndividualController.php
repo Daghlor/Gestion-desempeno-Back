@@ -8,6 +8,7 @@ use App\Models\ObjectivesIndividual;
 use App\Models\ObjectivesStrategics;
 use App\Models\StatesObjectives;
 use App\Models\User;
+use App\Models\UserHierarchy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -135,6 +136,60 @@ class ObjectivesIndividualController extends Controller
             200
         );
     }
+
+
+
+public function FindAllByHierarchy(Request $request, $userId)
+    {
+        $paginate = $request->input('paginate', 10);
+        $page = $request->input('page', 1);
+        $column = $request->input('column', 'title');
+        $direction = $request->input('direction', 'asc');
+        $search = $request->input('search', []);
+
+        // Obtener los IDs de los usuarios asignados al usuario dado
+        $assignedUserIds = UserHierarchy::where('parent_id', $userId)->pluck('user_id');
+
+        $objetivesQuery = ObjectivesIndividual::query();
+        $objetivesQuery->select([
+            'objectives_individuals.unique_id',
+            'objectives_individuals.objetive',
+            'objectives_individuals.weight',
+            'objectives_individuals.title',
+            'objectives_strategics.title as title_strategics',
+            'users.identify',
+            DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"),
+            'states_objectives.description as state',
+            'states_objectives.id as state_id'
+        ]);
+        $objetivesQuery->join('users', 'users.id', '=', 'objectives_individuals.user_id');
+        $objetivesQuery->join('objectives_strategics', 'objectives_strategics.id', '=', 'objectives_individuals.strategic_id');
+        $objetivesQuery->join('states_objectives', 'states_objectives.id', '=', 'objectives_individuals.state_id');
+        $objetivesQuery->whereIn('objectives_individuals.user_id', $assignedUserIds);
+
+        // Aplicar filtros de búsqueda si existen
+        if (!empty($search)) {
+            if (isset($search['objetive'])) {
+                $objetivesQuery->where('objectives_individuals.objetive', 'like', '%' . $search['objetive'] . '%');
+            }
+            // Agregar más condiciones de filtro según sea necesario
+        }
+
+        // Paginar resultados
+        $objetives = $objetivesQuery->orderBy($column, $direction)
+                                    ->paginate($paginate);
+
+        return response()->json([
+            'res' => true,
+            'data' => [
+                'objetives' => $objetives,
+                'total' => $objetives->total(),
+            ]
+        ], 200);
+    }
+
+
+
 
 
     // FUNCION PARA BUSCAR O ENCONTRAR UN OBJETIVO INDIVIDUAL POR SU UNIQUE_ID

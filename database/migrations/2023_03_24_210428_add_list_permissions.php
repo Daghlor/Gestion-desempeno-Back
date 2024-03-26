@@ -231,7 +231,7 @@ return new class extends Migration
             }
         }
         for ($i = 5; $i < 34; $i++) {
-            if ($i != 21 && $i != 23 && $i != 33) {
+            if ($i != 23 && $i != 18 && $i != 17 && $i != 29) {
                 RolesPermissions::create([
                     'rol_id' => 1,
                     'permissions_id' => $i,
