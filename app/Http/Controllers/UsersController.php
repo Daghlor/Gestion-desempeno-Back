@@ -381,6 +381,26 @@ class UsersController extends Controller
             'data' => 'Información Eliminada Correctamente'
         ), 200);
     }
+
+    // Función para obtener todos los usuarios con todos los campos
+public function getAllUsers(Request $request)
+{
+    $users = User::all();
+
+    return response()->json([
+        'res' => true,
+        'data' => $users
+    ], 200);
+}
+
+public function usersWithoutHierarchy()
+    {
+        // Obtener todos los usuarios que no tienen una jerarquía asignada
+        $usersWithoutHierarchy = User::whereDoesntHave('hierarchy')->get();
+
+        return response()->json($usersWithoutHierarchy);
+    }
+
 }
 
 // Copyright (c) Engagement

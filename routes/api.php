@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Route as RoutingRoute;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\Routing\Annotation\Route as AnnotationRoute;
+use App\Http\Controllers\UserHierarchyController;
 
 //Create
 //FindAll
@@ -63,6 +64,9 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::put('update/{uuid}', [UsersController::class, 'update']);
         Route::delete('delete/{uuid}', [UsersController::class, 'delete']);
         Route::post('verify', [UsersController::class, 'verify']);
+        Route::post('getAllUsers', [UsersController::class, 'getAllUsers']);
+        Route::post('usersWithoutHierarchy', [UsersController::class, 'usersWithoutHierarchy']);
+
     });
 
     Route::group([
@@ -124,6 +128,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::get('FindAllByUserUniqueId/{uuid}', [ObjectivesIndividualController::class, 'FindAllByUserUniqueId']);
         Route::delete('delete/{uuid}', [ObjectivesIndividualController::class, 'Delete']);
         Route::put('UpdateState/{uuid}', [ObjectivesIndividualController::class, 'UpdateState']);
+        Route::get('states', [ObjectivesIndividualController::class, 'GetAllStates']);
     });
 
     Route::group([
@@ -169,6 +174,19 @@ Route::group(['middleware' => ['jwt.verify']], function () {
             Route::get('FindAllByUserUniqueId/{uuid}', [TrainingActionsController::class, 'FindAllByUserUniqueId']);
         }
     );
+
+   Route::group([
+    'prefix' => 'user-hierarchies'
+], function ($router) {
+    Route::post('create', [UserHierarchyController::class, 'Create']);
+    Route::put('update/{userHierarchy}', [UserHierarchyController::class, 'update']);
+    Route::post('getAll', [UserHierarchyController::class, 'getAll']);
+    Route::delete('delete/{userHierarchy}', [UserHierarchyController::class, 'destroy']);
+    Route::delete('deleteAll', [UserHierarchyController::class, 'deleteAll']);
+    Route::get('findByUserUniqueId/{userUniqueId}', [UserHierarchyController::class, 'findByUserUniqueId']);
+});
+
+
 
     Route::group(
         [

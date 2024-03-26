@@ -38,6 +38,12 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsToMany(Roles::class, 'roles_users', 'user_id', 'rol_id');
     }
 
+    public function hierarchy()
+    {
+        // Lógica para recuperar la jerarquía del usuario
+        // Por ejemplo:
+        return $this->hasOne(UserHierarchy::class, 'user_id');
+    }
 
     public function getJWTIdentifier()
     {
