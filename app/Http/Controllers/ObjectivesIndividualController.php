@@ -27,6 +27,8 @@ class ObjectivesIndividualController extends Controller
             'state_id' => 1,
             'strategic_id' => $request->all()['strategic_id'],
             'plans_id' => $request->all()['plans_id'],
+            'start_date' => $request->input('start_date'),
+            'end_date' => $request->input('end_date'),
         ]);
 
         return response()->json(array(
@@ -100,7 +102,8 @@ class ObjectivesIndividualController extends Controller
             ->orderBy($column, $direction)
             ->get([
                 'objectives_individuals.unique_id',  'objectives_individuals.objetive', 'objectives_individuals.weight',
-                'objectives_individuals.title', 'objectives_strategics.title as title_strategics', 'users.identify',
+                'objectives_individuals.title','objectives_individuals.start_date',
+                'objectives_individuals.end_date', 'objectives_strategics.title as title_strategics', 'users.identify',
                 DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"),  'states_objectives.description as state',
                 'states_objectives.id as state_id'
             ]);
@@ -156,6 +159,8 @@ public function FindAllByHierarchy(Request $request, $userId)
             'objectives_individuals.objetive',
             'objectives_individuals.weight',
             'objectives_individuals.title',
+            'objectives_individuals.start_date', // Agregar fecha de inicio
+            'objectives_individuals.end_date',
             'objectives_strategics.title as title_strategics',
             'users.identify',
             DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"),
@@ -312,6 +317,48 @@ public function FindAllByHierarchy(Request $request, $userId)
         'data' => $states,
     ], 200);
 }
+
+// FUNCION PARA ACTUALIZAR LOS CAMPOS DE UN OBJETIVO INDIVIDUAL EXISTENTE
+public function Update(Request $request, $uuid)
+{
+    // Busca el objetivo individual por su UUID
+    $objective = ObjectivesIndividual::where('unique_id', $uuid)->first();
+
+    // Verifica si se encontró el objetivo
+    if (!$objective) {
+        return response()->json([
+            'res' => false,
+            'message' => 'Objetivo individual no encontrado.',
+        ], 404);
+    }
+
+    // Actualiza los campos del objetivo individual
+    $objective->title = $request->input('title', $objective->title);
+    $objective->objetive = $request->input('objetive', $objective->objetive);
+    $objective->weight = $request->input('weight', $objective->weight);
+    $objective->start_date = $request->input('start_date', $objective->start_date); // Actualizar fecha de inicio si se proporciona
+    $objective->end_date = $request->input('end_date', $objective->end_date);
+
+    // Verifica si se proporcionó el campo plans_id en la solicitud
+    if ($request->has('plans_id')) {
+        $objective->plans_id = $request->input('plans_id');
+    } else {
+        // Si no se proporcionó, establece plans_id como null
+        $objective->plans_id = null;
+    }
+
+    // Guarda los cambios
+    $objective->save();
+
+    return response()->json([
+        'res' => true,
+        'message' => 'Objetivo individual actualizado correctamente.',
+        'data' => $objective,
+    ], 200);
+}
+
+
+
 }
 
 

@@ -21,5 +21,7 @@ class ObjectivesIndividual extends Model
         'state_id',
         'strategic_id',
         'plans_id',
+        'start_date',
+        'end_date',
     ];
 }

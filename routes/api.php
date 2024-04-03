@@ -129,6 +129,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
         Route::get('FindAllByHierarchy/{id}', [ObjectivesIndividualController::class, 'FindAllByHierarchy']);
         Route::delete('delete/{uuid}', [ObjectivesIndividualController::class, 'Delete']);
         Route::put('UpdateState/{uuid}', [ObjectivesIndividualController::class, 'UpdateState']);
+        Route::put('Update/{uuid}', [ObjectivesIndividualController::class, 'Update']);
         Route::get('states', [ObjectivesIndividualController::class, 'GetAllStates']);
     });
 
