@@ -13,5 +13,8 @@ class TrainingActions extends Model
         'unique_id',
         'title',
         'user_id',
+        'start_date',
+        'end_date',
+        'state_id',
     ];
 }

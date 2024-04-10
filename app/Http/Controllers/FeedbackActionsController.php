@@ -12,33 +12,44 @@ use Illuminate\Support\Facades\DB;
 
 class FeedbackActionsController extends Controller
 {
-    // FUNCION PARA CREAR UNA ACCION DE RETROALIMENTACION
-    public function Create(Request $request)
-    {
-        $title = $request->input('title'); // Obtener el título del Request
 
-        if (!$title) {
-            return response()->json(array(
-                'res' => false,
-                'message' => 'Hace falta el título'
-            ), 400);
-        }
+// FUNCION QUE CREA UNA ACCION DE FORMACION
+public function create(Request $request)
+{
+    $title = $request->input('title');
+    $start_date = $request->input('start_date');
+    $end_date = $request->input('end_date');
+    $state_id = $request->input('state_id', 1); // Asignar 1 si no se proporciona state_id
 
-        $feeback = FeedbackActions::create([
-            'unique_id' => Str::uuid()->toString(),
-            'title' => $title, // Utilizar el título obtenido del Request
-            'user_id' => auth()->user()->id,
-        ]);
-
-        return response()->json(array(
-            'res' => true,
-            'data' => [
-                'training_id' => $feeback->unique_id,
-                'title' => $feeback->title,
-                'msg' => 'Accion de Retroalimentación Creada Correctamente'
-            ]
-        ), 200);
+    if (!$title || !$start_date || !$end_date) {
+        return response()->json([
+            'res' => false,
+            'message' => 'Falta información requerida'
+        ], 400);
     }
+
+    $feeback = FeedbackActions::create([
+        'unique_id' => Str::uuid()->toString(),
+        'title' => $title,
+        'start_date' => $start_date,
+        'end_date' => $end_date,
+        'state_id' => $state_id,
+        'user_id' => auth()->user()->id,
+    ]);
+
+    return response()->json([
+        'res' => true,
+        'data' => [
+            'training_id' => $feeback->unique_id,
+            'title' => $feeback->title,
+            'start_date' => $feeback->start_date,
+            'end_date' => $feeback->end_date,
+            'state_id' => $feeback->state_id,
+            'msg' => 'Acciones de formacion Creado Correctamente'
+        ]
+    ], 200);
+}
+
 
     // FUNCION PARA ACTUALIZAR UNA ACCION DE RETROALIMENTACION
     public function Update(Request $request, $uuid)
@@ -56,6 +67,17 @@ class FeedbackActionsController extends Controller
         if ($request->has('title')) {
             $feedback->title = $request->input('title');
         }
+        if ($request->has('start_date')) {
+        $feedback->start_date = $request->input('start_date');
+    }
+
+    if ($request->has('end_date')) {
+        $feedback->end_date = $request->input('end_date');
+    }
+
+    if ($request->has('state_id')) {
+        $feedback->state_id = $request->input('state_id');
+    }
 
         // Agregar más campos para actualizar aquí si es necesario
 
@@ -66,7 +88,10 @@ class FeedbackActionsController extends Controller
             'data' => [
                 'feedback_id' => $feedback->unique_id,
                 'title' => $feedback->title,
-                'msg' => 'Acciones de retroalimentacion actualizada correctamente'
+                'start_date' => $feedback->start_date,
+                'end_date' => $feedback->end_date,
+                'state_id' => $feedback->state_id,
+                'msg' => 'Acciones de formación actualizada correctamente'
             ]
         ], 200);
     }
@@ -87,42 +112,51 @@ class FeedbackActionsController extends Controller
         ), 200);
     }
 
-    // FUNCION PARA BUSCAR TODAS LAS ACCIONES DE RETROALIMENTACION
-    public function FindAll(Request $request)
-    {
-        $paginate = $request->all()['paginate'];
-        $page = $request->all()['page'];
-        $column = $request->all()['column'];
-        $direction = $request->all()['direction'];
-        $search = $request->all()['search'];
 
-        $feeback = FeedbackActions::join('users', 'users.id', '=', 'feeback_actions.user_id');
-        if (count($search) > 0) {
-            if (isset($search['title'])) {
-                $feeback = $feeback->where('feeback_actions.title', 'like', '%' . $search['title'] . '%');
-            }
-            if (isset($search['user_id'])) {
-                $feeback = $feeback->where('feeback_actions.user_id', $search['user_id']);
-            }
+     public function findAll(Request $request)
+{
+    $paginate = $request->input('paginate', 10);
+    $page = $request->input('page', 1);
+    $column = $request->input('column', 'title');
+    $direction = $request->input('direction', 'desc');
+    $search = $request->input('search', []);
+
+    $query = FeedbackActions::join('users', 'users.id', '=', 'feeback_actions.user_id')
+        ->leftJoin('states_objectives', 'states_objectives.id', '=', 'feeback_actions.state_id');
+
+    if (!empty($search)) {
+        if (isset($search['title'])) {
+            $query->where('feeback_actions.title', 'like', '%' . $search['title'] . '%');
         }
-
-        $feeback = $feeback->limit($paginate)
-            ->offset(($page - 1) * $paginate)
-            ->orderBy($column, $direction)
-            ->get([
-                'feeback_actions.id', 'feeback_actions.unique_id', 'feeback_actions.title', DB::raw("CONCAT(users.name,' ', users.lastName) AS nameUser"),
-            ]);
-
-        $total = FeedbackActions::count();
-
-        return response()->json([
-            'res' => true,
-            'data' => [
-                'titles' => $feeback,
-                'total' => $total,
-            ]
-        ], 200);
+        if (isset($search['user_id'])) {
+            $query->where('feeback_actions.user_id', $search['user_id']);
+        }
     }
+
+    $total = $query->count();
+
+    $feeback = $query->select(
+            'feeback_actions.id',
+            'feeback_actions.unique_id',
+            'feeback_actions.title',
+            'feeback_actions.start_date',
+            'feeback_actions.end_date',
+            DB::raw("CONCAT(users.name, ' ', users.lastName) AS nameUser"),
+            'states_objectives.description AS stateDescription'
+        )
+        ->orderBy($column, $direction)
+        ->offset(($page - 1) * $paginate)
+        ->limit($paginate)
+        ->get();
+
+    return response()->json([
+        'res' => true,
+        'data' => [
+            'feeback' => $feeback,
+            'total' => $total,
+        ]
+    ], 200);
+}
 
     // FUNCION PARA ELIMINAR UNA ACCION DE RETROALIMENTACION
     public function Delete($uuid)
