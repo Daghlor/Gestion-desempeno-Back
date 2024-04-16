@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\TrainingActions;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use App\Models\StatesObjectives;
 
 class TrainingActionsController extends Controller
 {
@@ -97,20 +98,42 @@ public function update(Request $request, $uuid)
 
 
     // FUNCION QUE BUSCA TODAS LAS ACCIONES CREADAS POR EL UNIQUE_ID DE UN USUARIO
-    public function FindAllByUserUniqueId(Request $request, $uuid)
-    {
-        // Buscar todos los objetivos individuales del usuario por su unique_id
-        $objetives = TrainingActions::where('user_id', function ($query) use ($uuid) {
-            $query->select('id')
-                ->from('users')
-                ->where('unique_id', $uuid);
-        })->get();
+    // public function FindAllByUserUniqueId(Request $request, $uuid)
+    // {
+    //     // Buscar todos los objetivos individuales del usuario por su unique_id
+    //     $objetives = TrainingActions::where('user_id', function ($query) use ($uuid) {
+    //         $query->select('id')
+    //             ->from('users')
+    //             ->where('unique_id', $uuid);
+    //     })->get();
 
-        return response()->json(array(
-            'res' => true,
-            'data' => $objetives
-        ), 200);
-    }
+    //     return response()->json(array(
+    //         'res' => true,
+    //         'data' => $objetives
+    //     ), 200);
+    // }
+
+    public function FindAllByUserUniqueId(Request $request, $uuid)
+{
+    // Buscar todos los objetivos individuales del usuario por su unique_id
+    $objetives = TrainingActions::where('user_id', function ($query) use ($uuid) {
+        $query->select('id')
+            ->from('users')
+            ->where('unique_id', $uuid);
+    })->get();
+
+    // Obtener las descripciones de la tabla states_objectives y agregarlas a los objetivos
+    $objetivesWithDescriptions = $objetives->map(function ($objetive) {
+        $stateDescription = StatesObjectives::where('id', $objetive->state_id)->pluck('description')->first();
+        $objetive->stateDescription = $stateDescription;
+        return $objetive;
+    });
+
+    return response()->json(array(
+        'res' => true,
+        'data' => $objetivesWithDescriptions
+    ), 200);
+}
 
    public function findAll(Request $request)
 {
