@@ -201,6 +201,18 @@ public function create(Request $request)
             'message' => 'Acciones de retroalimentacion eliminada correctamente'
         ], 200);
     }
+
+    public function GetAllStates()
+{
+    // Obtener todos los estados disponibles para los objetivos individuales desde la base de datos
+    $states = StatesObjectives::all();
+
+    // Devolver los estados como respuesta en formato JSON
+    return response()->json([
+        'res' => true,
+        'data' => $states,
+    ], 200);
+}
 }
 
 // Copyright (c) Engagement

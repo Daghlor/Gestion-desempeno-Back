@@ -174,6 +174,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
             Route::post('getAll', [TrainingActionsController::class, 'FindAll']);
             Route::delete('delete/{uuid}', [TrainingActionsController::class, 'Delete']);
             Route::get('FindAllByUserUniqueId/{uuid}', [TrainingActionsController::class, 'FindAllByUserUniqueId']);
+            Route::post('states', [TrainingActionsController::class, 'GetAllStates']);
         }
     );
 
@@ -200,6 +201,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
             Route::post('getAll', [FeedbackActionsController::class, 'FindAll']);
             Route::delete('delete/{uuid}', [FeedbackActionsController::class, 'Delete']);
             Route::get('FindAllByUserUniqueId/{uuid}', [FeedbackActionsController::class, 'FindAllByUserUniqueId']);
+            Route::post('states', [FeedbackActionsController::class, 'GetAllStates']);
         }
     );
 
